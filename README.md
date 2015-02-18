@@ -88,21 +88,33 @@ true    | false      | false     | false
 
 ## Motivation
 
+TODO
+
 ## Alternative implementations
 
-TODO
+*gotrap* is maybe not the best solution for this job, but coding this was fun anyway. Have a look below for alternative / possible solution for this problem.
+
+PS: If you had created such an alternative let me know.
 
 ### Jenkins
 
-TODO
+[Jenkins](http://jenkins-ci.org/) is a good tool to execute such work as well. A [Gerrit Trigger](https://wiki.jenkins-ci.org/display/JENKINS/Gerrit+Trigger) plugin already exists and works like a charm in several environments.
 
+With the help of jenkins you can do the same communication like *gotrap* as well. 
+One benefit would be the log of the single actions / commands will be public visible. 
+Maybe helpful to get a better understanding of what is going on.
+With Jenkins you are not limited to TravisCI tests, but can extend your tests as you wont.
+The disadvantage is: You have to host and maintain a jenkins environment.
 
-See some jenkins examples:
+But have a look what cool things you can create with jenkins (e.g. DB Datasets CI check):
 
 * [Change microversion header name](https://review.openstack.org/#/c/155611/) @ OpenStack Gerrit
 * [Add check for non-existing table internal name for delete table](https://review.openstack.org/#/c/156806/) @ OpenStack Gerrit
 
 ### Gerrit plugin
+
+Gerrit support custom plugins written in Java.
+To run *gotrap* we require two (`gerrit-rabbitmq-plugin` + `repliacation`).
 
 TODO
 
