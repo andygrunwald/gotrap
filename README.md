@@ -2,7 +2,14 @@
 
 [![Build Status](https://travis-ci.org/andygrunwald/gotrap.svg)](https://travis-ci.org/andygrunwald/gotrap)
 
-A Gerrit &lt;--> Github &lt;--> TravisCI connection written in Go.
+[Gerrit](https://code.google.com/p/gerrit/), a code review tool, is often used in bigger projects with self hosted infrastructure like [TYPO3](https://review.typo3.org/), [Android](https://android-review.googlesource.com/), [HPDD (Intel)](http://review.whamcloud.com/), [Qt](https://codereview.qt-project.org/) or [Golang](https://go-review.googlesource.com/).
+With a self hosted Git infrastructure there is no build in solution to use the continuous integration services like [Travis CI](https://travis-ci.org/).
+
+**gotrap** is a Gerrit <=> Github <=> TravisCI connection written in Go.
+
+PS: You don`t have to use TravisCI. You can use every service which can be triggered as pull request as github and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
+
+## Features
 
 TODO
 
@@ -90,6 +97,10 @@ TODO
 TODO
 
 ## FAQ
+
+### How does gotrap works?
+
+TODO
 
 ### Why JSON as config file format?
 
