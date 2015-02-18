@@ -1,5 +1,7 @@
 # gotrap
 
+[![Build Status](https://travis-ci.org/andygrunwald/gotrap.svg)](https://travis-ci.org/andygrunwald/gotrap)
+
 A Gerrit &lt;--> Github &lt;--> TravisCI connection written in Go.
 
 TODO
