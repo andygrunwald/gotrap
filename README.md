@@ -8,14 +8,10 @@ TODO
 
 ## Examples
 
-TODO
+Here are some examples how gotrap can look like:
 
-* https://review.typo3.org/#/c/36909/
-* https://review.typo3.org/#/c/36446/
-* https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests/pull/22
-* https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests/pull/23
-* https://review.typo3.org/#/c/36859/
-* https://review.typo3.org/#/c/36948/
+* [[BUGFIX] SelectViewHelper must respect option(Value|Label)Field for arrays](https://review.typo3.org/#/c/36909/) @ TYPO3 Gerrit: [Github PR](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests/pull/20), [Travis CI build](https://travis-ci.org/typo3-ci/TYPO3.CMS-pre-merge-tests/builds/50994127)
+* [[BUGFIX] Map table names in ext_tables_static+adt.sql in Install Tool](https://review.typo3.org/#/c/36859/) @ TYPO3 Gerrit: [Github PR](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests/pull/23), [Travis CI build](https://travis-ci.org/typo3-ci/TYPO3.CMS-pre-merge-tests/builds/50994906)
 
 ## Requirements
 
