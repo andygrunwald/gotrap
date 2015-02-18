@@ -1,0 +1,62 @@
+{
+  "gotrap": {
+    "concurrent": 2
+  },
+
+  "github": {
+    "username": "GITHUB-USERNAME",
+    "api-token": "GITHUB-API-TOKEN",
+
+    "organisation": "GITHUB-ORGANISATION",
+    "repository": "GITHUB-REPOSITORY",
+
+    "branch-polling-intervall": 15,
+    "status-polling-intervall": 30,
+
+    "pull-request": {
+      "title": "Gotrap: %title%",
+      "body": [
+        "%commit-msg%",
+        "",
+        "------",
+        "",
+        "Details: %url%",
+        "",
+        "------",
+        "",
+        "This PR was created (automatically) by [gotrap](https://github.com/andygrunwald/gotrap) with :heart: and :beer:"
+      ]
+    }
+  },
+
+  "amqp": {
+    "host": "AMQP-HOST",
+    "port": AMQP-PORT,
+
+    "username": "AMQP-USERNAME",
+    "password": "AMQP-PASSWORD",
+
+    "vhost": "AMQP-VHOST",
+    "exchange": "AMQP-EXCHANGE",
+    "queue": "AMQP-QUEUE",
+    "routing-key": "AMQP-ROUTING-KEY",
+
+    "identifier": "gotrap"
+  },
+
+  "gerrit": {
+    "url": "GERRIT-URL",
+
+    "username": "GERRIT-USERNAME",
+    "password": "GERRIT-PASSWORD",
+
+    "comment": [
+      "Github tests: %state%",
+      "",
+      "Pull request: %pr%",
+      "",
+      "",
+      "%status%"
+    ]
+  }
+}
