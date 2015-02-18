@@ -94,7 +94,7 @@ TODO
 
 *gotrap* is maybe not the best solution for this job, but coding this was fun anyway. Have a look below for alternative / possible solution for this problem.
 
-PS: If you had created such an alternative let me know.
+PS: If you had created such an alternative let me know :wink:
 
 ### Jenkins
 
@@ -103,7 +103,7 @@ PS: If you had created such an alternative let me know.
 With the help of jenkins you can do the same communication like *gotrap* as well. 
 One benefit would be the log of the single actions / commands will be public visible. 
 Maybe helpful to get a better understanding of what is going on.
-With Jenkins you are not limited to TravisCI tests, but can extend your tests as you wont.
+With Jenkins you are not limited to TravisCI tests, but can extend your tests as you won\`t.
 The disadvantage is: You have to host and maintain a jenkins environment.
 
 But have a look what cool things you can create with jenkins (e.g. DB Datasets CI check):
@@ -116,7 +116,13 @@ But have a look what cool things you can create with jenkins (e.g. DB Datasets C
 Gerrit support custom plugins written in Java.
 To run *gotrap* we require two (`gerrit-rabbitmq-plugin` + `repliacation`).
 
-TODO
+To transfer this logic to a custom Gerrit plugin would make sense.
+With this we don\`t depend on two plugins and a custom tool written in Go.
+You don\`t have to deal with a deployment, configuration and monitoring of *gotrap*.
+All configuration can be embedded into Gerrit.
+
+One disadvantages of this will be that you have to keep your plugin in sync with the development of Gerrit (if they change the plugin API).
+*gotrap* communicates via their public stream API (which won\`t be changed hopefully).
 
 ## FAQ
 
