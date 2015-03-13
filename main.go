@@ -31,22 +31,19 @@ func main() {
 
 	// Build the AMQP connection
 	amqp := NewAmqpConnection(conf.Amqp.Host, conf.Amqp.Port, conf.Amqp.Username, conf.Amqp.Password, conf.Amqp.VHost)
-	err := amqp.connect()
 
 	// If we don`t get a AMQP connection we can exit here
 	// Without AMQP connection gotrap is useless
-	if err != nil {
+	if err := amqp.connect(); err != nil {
 		log.Fatalf("> AMQP connection not available: %v", err)
 		os.Exit(1)
 	}
 	defer amqp.Connection.Close()
 
-	// Declare AMQP exchange and queue and bind them togeter :)
-	amqp.declareAndBind(conf.Amqp.Exchange, conf.Amqp.Queue, conf.Amqp.RoutingKey)
-
+	// Declare AMQP exchange and queue and bind them together :)
 	// If this will fail we can exit here with the same reason like above
 	// Without queue gotrap is useless
-	if err != nil {
+	if err := amqp.declareAndBind(conf.Amqp.Exchange, conf.Amqp.Queue, conf.Amqp.RoutingKey); err != nil {
 		log.Fatalf("> AMQP Declare and bind: %v", err)
 		os.Exit(1)
 	}
