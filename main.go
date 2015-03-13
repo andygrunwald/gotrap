@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"log"
-	"os"
 	"runtime"
 	"sync"
 )
@@ -36,7 +35,6 @@ func main() {
 	// Without AMQP connection gotrap is useless
 	if err := amqp.connect(); err != nil {
 		log.Fatalf("> AMQP connection not available: %v", err)
-		os.Exit(1)
 	}
 	defer amqp.Connection.Close()
 
@@ -45,14 +43,12 @@ func main() {
 	// Without queue gotrap is useless
 	if err := amqp.declareAndBind(conf.Amqp.Exchange, conf.Amqp.Queue, conf.Amqp.RoutingKey); err != nil {
 		log.Fatalf("> AMQP Declare and bind: %v", err)
-		os.Exit(1)
 	}
 
 	// Get the consumer channel to get all messages
 	messages, err := amqp.Channel.Consume(conf.Amqp.Queue, conf.Amqp.Identifier, false, false, false, false, nil)
 	if err != nil {
 		log.Fatalf("> AMQP Basic.consume: %v", err)
-		os.Exit(1)
 	}
 
 	// Bootstrap a waitgroup
