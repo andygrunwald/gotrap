@@ -155,14 +155,14 @@ func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, erro
 	return &change, nil
 }
 
-func (g GerritInstance) isPatchsetTheCurrentPatchset(m *Message) (bool, error) {
-	change, err := g.getChangeInformation(m.Change.ID)
+func (g GerritInstance) isPatchsetTheCurrentPatchset(changeID string, patchsetNumber uint) (bool, error) {
+	change, err := g.getChangeInformation(changeID)
 
 	if err != nil {
 		return false, err
 	}
 
-	if m.Patchset.Number == change.Revisions[change.CurrentRevision].Number {
+	if patchsetNumber == change.Revisions[change.CurrentRevision].Number {
 		return true, nil
 	}
 

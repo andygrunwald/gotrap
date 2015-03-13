@@ -37,7 +37,7 @@ func handleNewMessage(g GithubClient, gerrit GerritInstance, c Configuration, ev
 		// The current patchset will be delivered later as message.
 		// So we won`t skip this changeset
 		// https://review.typo3.org/a/changes/I640486e9f32da6ac1eba05e3c38d15a0aba41055/?o=CURRENT_REVISION
-		if currentPatchset, _ := gerrit.isPatchsetTheCurrentPatchset(&change); currentPatchset == false {
+		if currentPatchset, _ := gerrit.isPatchsetTheCurrentPatchset(change.Change.ID, change.Patchset.Number); currentPatchset == false {
 			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s)", change.Patchset.Ref)
 			return
 		}
