@@ -19,12 +19,12 @@ func init() {
 
 // The heart of gotrap.
 func main() {
+	fmt.Println("Hey, nice to meet you. Just wait a second. I will start up.")
+
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Parse all arguments
 	flag.Parse()
-
-	fmt.Println("Hey, nice to meet you. Just wait a second. I will start up.")
 
 	// Bootstrap configuration file
 	conf := NewConfiguration(configFile)
@@ -74,7 +74,6 @@ func main() {
 		for event := range messages {
 			// Semaphore! Fill it
 			sem <- true
-			log.Printf("Add semaphore ... len: %d", len(sem))
 			wg.Add(1)
 
 			// One go routine per message
@@ -82,7 +81,6 @@ func main() {
 				defer func() {
 					// Semaphore! Release it if this message was handled
 					<-sem
-					log.Printf("Release semaphore ... len: %d", len(sem))
 					wg.Done()
 				}()
 
