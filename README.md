@@ -26,10 +26,10 @@ Here are some examples how gotrap can look like:
 
 ## Requirements
 
-TODO
+To run *gotrap* your Gerrit instance has to fulfil the requirements below, enable and configured two plugins:
 
 * [Gerrit](https://code.google.com/p/gerrit/) in >= v2.9.2 (TODO: Has to be checked)
-* [gerrit-rabbitmq-plugin](https://github.com/rinrinne/gerrit-rabbitmq-plugin)
+* Gerrit plugin [gerrit-rabbitmq-plugin](https://github.com/rinrinne/gerrit-rabbitmq-plugin)
 * Gerrit plugin `replication`
 
 ## Installation
@@ -88,7 +88,7 @@ true    | false      | false     | false
 
 ## Motivation
 
-TODO
+I was active in the TYPO3 community some time ago and if th
 
 ## Alternative implementations
 
@@ -114,7 +114,7 @@ But have a look what cool things you can create with jenkins (e.g. DB Datasets C
 ### Gerrit plugin
 
 Gerrit support custom plugins written in Java.
-To run *gotrap* we require two (`gerrit-rabbitmq-plugin` + `repliacation`).
+To run *gotrap* we require two (`gerrit-rabbitmq-plugin` + `replication`).
 
 To transfer this logic to a custom Gerrit plugin would make sense.
 With this we don\`t depend on two plugins and a custom tool written in Go.
