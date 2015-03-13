@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"runtime"
@@ -19,7 +18,8 @@ func init() {
 
 // The heart of gotrap.
 func main() {
-	fmt.Println("Hey, nice to meet you. Just wait a second. I will start up.")
+	log.Println("Hey, nice to meet you. Just wait a second. I will start up.")
+	defer log.Println("Our job is done. We have to go.")
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
@@ -96,5 +96,4 @@ func main() {
 
 	wg.Wait()
 
-	fmt.Println("Our job is done. We have to go.")
 }
