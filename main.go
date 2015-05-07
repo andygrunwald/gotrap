@@ -31,6 +31,7 @@ func init() {
 func main() {
 	flag.Parse()
 
+	// Output the version and exit
 	if *flagVersion {
 		fmt.Printf("gotrap v%d.%d.%d\n", MajorVersion, MinorVersion, PatchVersion)
 		return
@@ -38,8 +39,6 @@ func main() {
 
 	log.Println("Hey, nice to meet you. Just wait a second. I will start up.")
 	defer log.Println("Our job is done. We have to go.")
-
-	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// Bootstrap configuration file
 	conf := NewConfiguration(flagConfigFile)
