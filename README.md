@@ -141,7 +141,21 @@ Maybe it works with others as well, but the were not tested.
 
 ### What is about the Github API rate limit?
 
-TODO
+The Github API (in v3) got a [Rate limit](https://developer.github.com/v3/#rate-limiting).
+Currently (2015-03-13) this are
+
+* Authenticated requests: 5000 requests per hour
+* Unauthenticated requests: 60 requests per hour
+
+*gotrap* needs an authentication at github to create pull requests.
+
+TODO Talk about timings and reqs per hour.
+
+### Can i start multiple Travis CI tests in parallel?
+
+Yes, you can.
+You need to raise the `Concurrent jobs` setting at Travis CI.
+See [Per Repository Concurrency Setting](http://blog.travis-ci.com/2014-07-18-per-repository-concurrency-setting/) at the Travis CI blog.
 
 ## License
 
