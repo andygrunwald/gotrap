@@ -1,9 +1,9 @@
 package main
 
 import (
-	"code.google.com/p/goauth2/oauth"
 	"errors"
 	"github.com/google/go-github/github"
+	"golang.org/x/oauth2"
 	"log"
 	"strings"
 	"time"
@@ -15,14 +15,26 @@ type GithubClient struct {
 	Conf   *githubConfiguration
 }
 
+// tokenSource is an oauth2.TokenSource which returns a static access token
+type tokenSource struct {
+	token *oauth2.Token
+}
+
+// Token implements the oauth2.TokenSource interface
+func (t *tokenSource) Token() (*oauth2.Token, error) {
+	return t.token, nil
+}
+
 // NewGithubClient will return a new Github client
 func NewGithubClient(conf *githubConfiguration) *GithubClient {
-	// Simple OAuth transport
-	transport := &oauth.Transport{
-		Token: &oauth.Token{AccessToken: conf.APIToken},
+
+	transport := &tokenSource{
+		token: &oauth2.Token{AccessToken: conf.APIToken},
 	}
 
-	c := github.NewClient(transport.Client())
+	transportClient := oauth2.NewClient(oauth2.NoContext, transport)
+
+	c := github.NewClient(transportClient)
 
 	client := &GithubClient{
 		Client: c,
