@@ -51,18 +51,14 @@ type Configuration struct {
 	Gerrit gerritConfiguration `json:"gerrit"`
 }
 
-func NewConfiguration(configFile *string) *Configuration {
+func (config *Configuration) init(configFile *string) {
 	fileContent, err := ioutil.ReadFile(*configFile)
 	if err != nil {
 		log.Fatal("Configuration file not found:", *configFile, err)
 	}
 
-	var config Configuration
-
 	err = json.Unmarshal(fileContent, &config)
 	if err != nil {
 		log.Fatal("JSON parsing failed:", *configFile, err)
 	}
-
-	return &config
 }

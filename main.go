@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"runtime"
+	//"runtime"
 	"sync"
 )
 
@@ -15,7 +15,6 @@ var (
 )
 
 const (
-	// Version number
 	MajorVersion = 1
 	MinorVersion = 0
 	PatchVersion = 0
@@ -41,14 +40,15 @@ func main() {
 	defer log.Println("Our job is done. We have to go.")
 
 	// Bootstrap configuration file
-	conf := NewConfiguration(flagConfigFile)
+	var config Configuration
+	config.init(flagConfigFile)
 
 	// We have to do this in a loop, to reconnect to rabbitmq automatically
 	// This connection times out sometimes.
 	for {
 
 		// Build the AMQP connection
-		amqp := NewAmqpConnection(conf.Amqp.Host, conf.Amqp.Port, conf.Amqp.Username, conf.Amqp.Password, conf.Amqp.VHost)
+		amqp := NewAmqpConnection(config.Amqp.Host, config.Amqp.Port, config.Amqp.Username, config.Amqp.Password, config.Amqp.VHost)
 
 		// If we don`t get a AMQP connection we can exit here
 		// Without AMQP connection gotrap is useless
@@ -60,12 +60,12 @@ func main() {
 		// Declare AMQP exchange and queue and bind them together :)
 		// If this will fail we can exit here with the same reason like above
 		// Without queue gotrap is useless
-		if err := amqp.declareAndBind(conf.Amqp.Exchange, conf.Amqp.Queue, conf.Amqp.RoutingKey); err != nil {
+		if err := amqp.declareAndBind(config.Amqp.Exchange, config.Amqp.Queue, config.Amqp.RoutingKey); err != nil {
 			log.Fatalf("> AMQP Declare and bind: %v", err)
 		}
 
 		// Get the consumer channel to get all messages
-		messages, err := amqp.Channel.Consume(conf.Amqp.Queue, conf.Amqp.Identifier, false, false, false, false, nil)
+		messages, err := amqp.Channel.Consume(config.Amqp.Queue, config.Amqp.Identifier, false, false, false, false, nil)
 		if err != nil {
 			log.Fatalf("> AMQP Basic.consume: %v", err)
 		}
@@ -76,7 +76,7 @@ func main() {
 		wg.Add(1)
 
 		// Limit number of concurrent patch requests here with a semaphore
-		sem := make(chan bool, conf.Gotrap.Concurrent)
+		sem := make(chan bool, config.Gotrap.Concurrent)
 
 		// Start main go routine to receive messages by the AMQP broker
 		go func() {
@@ -97,15 +97,16 @@ func main() {
 					}()
 
 					// Bootstrap the Github and Gerrit client ...
-					githubClient := *NewGithubClient(&conf.Github)
-					gerritClient := *NewGerritInstance(&conf.Gerrit)
+					githubClient := *NewGithubClient(&config.Github)
+					gerritClient := *NewGerritInstance(&config.Gerrit)
 
 					// ... and start handle the message!
-					handleNewMessage(githubClient, gerritClient, *conf, event)
+					handleNewMessage(githubClient, gerritClient, config, event)
 				}()
 			}
 		}()
 
 		wg.Wait()
 	}
+
 }
