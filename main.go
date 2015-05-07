@@ -2,31 +2,47 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 	"runtime"
 	"sync"
 )
 
 // Global variable to store the configuration file
-var configFile *string
+var (
+	flagConfigFile *string
+	flagVersion    *bool
+)
+
+const (
+	// Version number
+	MajorVersion = 1
+	MinorVersion = 0
+	PatchVersion = 0
+)
 
 // Init function to define arguments
 func init() {
-	configFile = flag.String("c", "./config.json", "Configuration file")
+	flagConfigFile = flag.String("config", "./config.json", "Configuration file")
+	flagVersion = flag.Bool("version", false, "Outputs the version number and exits")
 }
 
 // The heart of gotrap.
 func main() {
+	flag.Parse()
+
+	if *flagVersion {
+		fmt.Printf("gotrap v%d.%d.%d\n", MajorVersion, MinorVersion, PatchVersion)
+		return
+	}
+
 	log.Println("Hey, nice to meet you. Just wait a second. I will start up.")
 	defer log.Println("Our job is done. We have to go.")
 
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
-	// Parse all arguments
-	flag.Parse()
-
 	// Bootstrap configuration file
-	conf := NewConfiguration(configFile)
+	conf := NewConfiguration(flagConfigFile)
 
 	// We have to do this in a loop, to reconnect to rabbitmq automatically
 	// This connection times out sometimes.
