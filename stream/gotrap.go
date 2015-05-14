@@ -95,6 +95,7 @@ func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance,
 		msg += fmt.Sprintf("See [%s](%s) for details.", change.Change.Subject, change.Change.URL)
 
 		// TODO Add Details to Github Pull Request, before closing
+		// This does not work currently. I don`t have a clue why. Check this later ;)
 		g.AddCommentToPullRequest(pullRequest, msg)
 
 		g.ClosePullRequest(pullRequest)
