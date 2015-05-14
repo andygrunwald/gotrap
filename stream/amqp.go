@@ -1,7 +1,6 @@
 package stream
 
 import (
-	"fmt"
 	"github.com/andygrunwald/gotrap/config"
 	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/andygrunwald/gotrap/github"
