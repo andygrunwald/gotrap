@@ -1,21 +1,22 @@
-package main
+package config
 
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 )
+
+type Configuration struct {
+	Gotrap gotrapConfiguration `json:"gotrap"`
+	Github GithubConfiguration `json:"github"`
+	Amqp   AmqpConfiguration   `json:"amqp"`
+	Gerrit GerritConfiguration `json:"gerrit"`
+}
 
 type gotrapConfiguration struct {
 	Concurrent int `json:"concurrent"`
 }
 
-type githubPullRequestTemplate struct {
-	Title string   `json:"title"`
-	Body  []string `json:"body"`
-}
-
-type githubConfiguration struct {
+type GithubConfiguration struct {
 	Username               string                    `json:"username"`
 	APIToken               string                    `json:"api-token"`
 	Organisation           string                    `json:"organisation"`
@@ -25,7 +26,12 @@ type githubConfiguration struct {
 	PRTemplate             githubPullRequestTemplate `json:"pull-request"`
 }
 
-type amqpConfiguration struct {
+type githubPullRequestTemplate struct {
+	Title string   `json:"title"`
+	Body  []string `json:"body"`
+}
+
+type AmqpConfiguration struct {
 	Host       string `json:"host"`
 	Port       int    `json:"port"`
 	Username   string `json:"username"`
@@ -37,28 +43,24 @@ type amqpConfiguration struct {
 	Identifier string `json:"identifier"`
 }
 
-type gerritConfiguration struct {
+type GerritConfiguration struct {
 	URL      string   `json:"url"`
 	Username string   `json:"username"`
 	Password string   `json:"password"`
 	Comment  []string `json:"comment"`
 }
 
-type Configuration struct {
-	Gotrap gotrapConfiguration `json:"gotrap"`
-	Github githubConfiguration `json:"github"`
-	Amqp   amqpConfiguration   `json:"amqp"`
-	Gerrit gerritConfiguration `json:"gerrit"`
-}
-
-func (config *Configuration) init(configFile *string) {
+func NewConfiguration(configFile *string) (*Configuration, error) {
 	fileContent, err := ioutil.ReadFile(*configFile)
 	if err != nil {
-		log.Fatal("Configuration file not found:", *configFile, err)
+		return nil, err
 	}
 
+	var config Configuration
 	err = json.Unmarshal(fileContent, &config)
 	if err != nil {
-		log.Fatal("JSON parsing failed:", *configFile, err)
+		return nil, err
 	}
+
+	return &config, nil
 }

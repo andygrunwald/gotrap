@@ -1,9 +1,10 @@
-package main
+package gerrit
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/andygrunwald/gotrap/config"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -59,7 +60,7 @@ type RevisionInfo struct {
 }
 
 // NewGerritInstance returns a new Gerrit instance
-func NewGerritInstance(c *gerritConfiguration) *GerritInstance {
+func NewGerritClient(c *config.GerritConfiguration) *GerritInstance {
 	gerrit := &GerritInstance{
 		URL:      c.URL,
 		Username: c.Username,
@@ -71,7 +72,7 @@ func NewGerritInstance(c *gerritConfiguration) *GerritInstance {
 }
 
 // https://review.typo3.org/Documentation/rest-api-changes.html#set-review
-func (g GerritInstance) postCommentOnChangeset(m *Message, vote int, msg string) {
+func (g GerritInstance) PostCommentOnChangeset(m *Message, vote int, msg string) {
 	log.Printf("> Start posting review for %s (%s)", m.Change.URL, m.Patchset.Ref)
 
 	changeID := m.Change.ID
@@ -155,7 +156,7 @@ func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, erro
 	return &change, nil
 }
 
-func (g GerritInstance) isPatchsetTheCurrentPatchset(changeID string, patchsetNumber uint) (bool, error) {
+func (g GerritInstance) IsPatchsetTheCurrentPatchset(changeID string, patchsetNumber uint) (bool, error) {
 	change, err := g.getChangeInformation(changeID)
 
 	if err != nil {

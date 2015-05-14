@@ -1,7 +1,9 @@
-package main
+package github
 
 import (
 	"errors"
+	"github.com/andygrunwald/gotrap/config"
+	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 	"log"
@@ -12,7 +14,7 @@ import (
 // GithubClient offers the functionality to communicate with Github
 type GithubClient struct {
 	Client *github.Client
-	Conf   *githubConfiguration
+	Conf   *config.GithubConfiguration
 }
 
 // tokenSource is an oauth2.TokenSource which returns a static access token
@@ -26,7 +28,7 @@ func (t *tokenSource) Token() (*oauth2.Token, error) {
 }
 
 // NewGithubClient will return a new Github client
-func NewGithubClient(conf *githubConfiguration) *GithubClient {
+func NewGithubClient(conf *config.GithubConfiguration) *GithubClient {
 
 	transport := &tokenSource{
 		token: &oauth2.Token{AccessToken: conf.APIToken},
@@ -75,7 +77,7 @@ func (c GithubClient) waitUntilBranchisSynced(branchName string) error {
 
 // waitUntilCommitStatusIsAvailable checks if an external service (like TravisCI)
 // already finished the process and reports back via the Github Commit Status API
-func (c GithubClient) waitUntilCommitStatusIsAvailable(pr github.PullRequest) (*github.CombinedStatus, error) {
+func (c GithubClient) WaitUntilCommitStatusIsAvailable(pr github.PullRequest) (*github.CombinedStatus, error) {
 	s := new(github.CombinedStatus)
 	var err error
 
@@ -114,7 +116,7 @@ Loop:
 
 // createPullRequestForPatchset will create a new Pull Request at Github
 // All information (like base and target branch) are received by the message by Gerrit
-func (c GithubClient) createPullRequestForPatchset(m *Message) (*github.PullRequest, error) {
+func (c GithubClient) CreatePullRequestForPatchset(m *gerrit.Message) (*github.PullRequest, error) {
 
 	// Remove "refs/" from the patchset reference,
 	// because if this patchset is synced to Github
@@ -156,7 +158,7 @@ func (c GithubClient) createPullRequestForPatchset(m *Message) (*github.PullRequ
 	return prResult, nil
 }
 
-func (c GithubClient) addCommentToPullRequest(pr *github.PullRequest, message string) (bool, error) {
+func (c GithubClient) AddCommentToPullRequest(pr *github.PullRequest, message string) (bool, error) {
 
 	comment := &github.PullRequestComment{
 		Body: &message,
@@ -171,7 +173,7 @@ func (c GithubClient) addCommentToPullRequest(pr *github.PullRequest, message st
 	return true, nil
 }
 
-func (c GithubClient) closePullRequest(pr *github.PullRequest) (bool, error) {
+func (c GithubClient) ClosePullRequest(pr *github.PullRequest) (bool, error) {
 	// func (s *PullRequestsService) Edit(owner string, repo string, number int, pull *PullRequest) (*PullRequest, *Response, error)
 	state := "closed"
 	updatePr := &github.PullRequest{
