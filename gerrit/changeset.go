@@ -1,4 +1,14 @@
-package main
+package gerrit
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"strings"
+)
 
 func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, error) {
 	urlToCall := fmt.Sprintf("%s/changes/%s/?o=CURRENT_REVISION", g.getAPIUrl(), changeID)

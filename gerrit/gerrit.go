@@ -1,13 +1,7 @@
 package gerrit
 
 import (
-	"encoding/json"
-	"errors"
-	"fmt"
 	"github.com/andygrunwald/gotrap/config"
-	"io/ioutil"
-	"log"
-	"net/http"
 	"strings"
 )
 
