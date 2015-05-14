@@ -26,8 +26,6 @@ func (s *AmqpStream) Initialize(config *config.Configuration) {
 }
 
 func (s *AmqpStream) Start() error {
-	fmt.Println("amqp stream Start call")
-
 	// We have to do this in a loop, to reconnect to rabbitmq automatically
 	// This connection times out sometimes.
 	for {
