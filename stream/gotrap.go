@@ -12,8 +12,11 @@ import (
 )
 
 func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance, c *config.Configuration, event amqp.Delivery) {
-	// Acknowledge message
-	defer event.Ack(false)
+	// Acknowledge message if we get this
+	// We do this, because at the end of proceeding we might lost the connection to AMQP server
+	// I know this is wrong, but currently the reconnection does not work correctly :(
+	// TODO: Fix this later and Ack message if its done
+	event.Ack(false)
 
 	var change gerrit.Message
 
