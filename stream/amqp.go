@@ -43,13 +43,13 @@ func (s *AmqpStream) Start() error {
 		// If this will fail we can exit here with the same reason like above
 		// Without queue gotrap is useless
 		if err := s.declareAndBind(&s.Config.Amqp); err != nil {
-			log.Fatalf("> AMQP Declare and bind: %v", err)
+			return err
 		}
 
 		// Get the consumer channel to get all messages
 		messages, err := s.Channel.Consume(s.Config.Amqp.Queue, s.Config.Amqp.Identifier, false, false, false, false, nil)
 		if err != nil {
-			log.Fatalf("> AMQP Basic.consume: %v", err)
+			return err
 		}
 
 		// Bootstrap a waitgroup
@@ -143,7 +143,6 @@ func (s *AmqpStream) declareAndBind(config *config.AmqpConfiguration) error {
 	//	noWait: false
 	err := s.Channel.ExchangeDeclare(config.Exchange, "fanout", false, false, false, false, nil)
 	if err != nil {
-		log.Fatalf("> AMQP Exchange.declare: %s", err)
 		return err
 	}
 
@@ -154,13 +153,11 @@ func (s *AmqpStream) declareAndBind(config *config.AmqpConfiguration) error {
 	//	noWait: false
 	_, err = s.Channel.QueueDeclare(config.Queue, true, false, false, false, nil)
 	if err != nil {
-		log.Fatalf("> AMQP Queue.declare: %v", err)
 		return err
 	}
 
 	err = s.Channel.QueueBind(config.Queue, config.RoutingKey, config.Exchange, false, nil)
 	if err != nil {
-		log.Fatalf("> AMQP Queue.bind: %v", err)
 		return err
 	}
 
