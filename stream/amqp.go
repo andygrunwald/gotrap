@@ -5,7 +5,6 @@ import (
 	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/andygrunwald/gotrap/github"
 	"github.com/streadway/amqp"
-	"log"
 	"sync"
 )
 
