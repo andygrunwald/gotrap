@@ -57,5 +57,8 @@ func main() {
 	}
 
 	stream.Initialize(config)
-	stream.Start()
+	err = stream.Start()
+	if err != nil {
+		log.Fatal("Stream start failed:", err)
+	}
 }
