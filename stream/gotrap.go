@@ -23,6 +23,7 @@ func (trap *Gotrap) TakeAction() {
 	case "patchset-created":
 		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (\"%s\")", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
 
+		// TODO Get rid of hardcoded TYPO3
 		if trap.message.Change.Project != "Packages/TYPO3.CMS" {
 			log.Printf("> Project \"%s\" currently not supported. Only \"%s\"", trap.message.Change.Project, "Packages/TYPO3.CMS")
 			return
