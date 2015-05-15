@@ -27,13 +27,9 @@ func (s *AmqpStream) Start() error {
 	// We have to do this in a loop, to reconnect to rabbitmq automatically
 	// This connection times out sometimes.
 	for {
-
-		// Build the AMQP connection
-		s.URI = newAmqpConnection(&s.Config.Amqp)
-
 		// If we don`t get a AMQP connection we can exit here
 		// Without AMQP connection gotrap is useless
-		if err := s.connect(); err != nil {
+		if err := s.Connect(); err != nil {
 			return err
 		}
 		defer s.Connection.Close()
@@ -41,7 +37,7 @@ func (s *AmqpStream) Start() error {
 		// Declare AMQP exchange and queue and bind them together :)
 		// If this will fail we can exit here with the same reason like above
 		// Without queue gotrap is useless
-		if err := s.declareAndBind(&s.Config.Amqp); err != nil {
+		if err := s.DeclareAndBind(&s.Config.Amqp); err != nil {
 			return err
 		}
 
@@ -89,26 +85,23 @@ func (s *AmqpStream) Start() error {
 
 		wg.Wait()
 	}
-}
 
-// NewAmqpConnection returns a new AMQP connection.
-// To establish a connection various credentials like host, port, username, password and vhost are required.
-func newAmqpConnection(config *config.AmqpConfiguration) *amqp.URI {
-	uri := &amqp.URI{
-		Scheme:   "amqp",
-		Host:     config.Host,
-		Port:     config.Port,
-		Username: config.Username,
-		Password: config.Password,
-		Vhost:    config.VHost,
-	}
-
-	return uri
+	wg.Wait()
+	return nil
 }
 
 // Connect connects to the AMQP server.
 // The credentials are received by the AmqpInstance struct
-func (s *AmqpStream) connect() error {
+func (s *AmqpStream) Connect() error {
+
+	s.URI = &amqp.URI{
+		Scheme:   "amqp",
+		Host:     s.Config.Amqp.Host,
+		Port:     s.Config.Amqp.Port,
+		Username: s.Config.Amqp.Username,
+		Password: s.Config.Amqp.Password,
+		Vhost:    s.Config.Amqp.VHost,
+	}
 
 	var err error
 
@@ -132,7 +125,7 @@ func (s *AmqpStream) connect() error {
 // We declare our topology on both the publisher and consumer to ensure they
 // are the same. This is part of AMQP being a programmable messaging model.
 // After declaring we are binding it to be able to receive messages in the queue by the exchange.
-func (s *AmqpStream) declareAndBind(config *config.AmqpConfiguration) error {
+func (s *AmqpStream) DeclareAndBind(config *config.AmqpConfiguration) error {
 
 	// Settings:
 	//	type: fanout
