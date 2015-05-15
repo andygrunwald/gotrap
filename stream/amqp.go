@@ -25,6 +25,8 @@ func (s *AmqpStream) Initialize(config *config.Configuration) {
 
 func (s *AmqpStream) Start() error {
 	var wg sync.WaitGroup
+	// Limit number of concurrent patch requests here with a semaphore
+	sem := make(chan bool, s.Config.Gotrap.Concurrent)
 
 	// We have to do this in a loop, to reconnect to rabbitmq automatically
 	// This connection times out sometimes.
@@ -49,37 +51,28 @@ func (s *AmqpStream) Start() error {
 			return err
 		}
 
-		// Limit number of concurrent patch requests here with a semaphore
-		sem := make(chan bool, s.Config.Gotrap.Concurrent)
+		// Get new messages by the AMQP broker
+		for event := range messages {
+			// Semaphore! Fill it
+			sem <- true
+			wg.Add(1)
 
-		// Start main go routine to receive messages by the AMQP broker
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
-			// Get new messages
-			for event := range messages {
-				// Semaphore! Fill it
-				sem <- true
-				wg.Add(1)
-
-				// One go routine per message
-				go func() {
-					defer func() {
-						// Semaphore! Release it if this message was handled
-						<-sem
-						wg.Done()
-					}()
-
-					// Bootstrap the Github and Gerrit client ...
-					githubClient := *github.NewGithubClient(&s.Config.Github)
-					gerritClient := *gerrit.NewGerritClient(&s.Config.Gerrit)
-
-					// ... and start handle the message!
-					handleNewMessage(githubClient, gerritClient, s.Config, event)
+			// One go routine per message
+			go func() {
+				defer func() {
+					// Semaphore! Release it if this message was handled
+					<-sem
+					wg.Done()
 				}()
-			}
-		}()
+
+				// Bootstrap the Github and Gerrit client ...
+				githubClient := *github.NewGithubClient(&s.Config.Github)
+				gerritClient := *gerrit.NewGerritClient(&s.Config.Gerrit)
+
+				// ... and start handle the message!
+				handleNewMessage(githubClient, gerritClient, s.Config, event)
+			}()
+		}
 	}
 
 	wg.Wait()
