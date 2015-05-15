@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"github.com/andygrunwald/gotrap/config"
 	"github.com/andygrunwald/gotrap/stream"
+	"io/ioutil"
 	"log"
+	"os"
+	"strconv"
 )
 
 var (
 	flagConfigFile *string
+	flagPidFile    *string
 	flagVersion    *bool
 )
 
@@ -22,6 +26,7 @@ const (
 // Init function to define arguments
 func init() {
 	flagConfigFile = flag.String("config", "", "Configuration file")
+	flagPidFile = flag.String("pidfile", "", "Write the process id into a given file")
 	flagVersion = flag.Bool("version", false, "Outputs the version number and exits")
 }
 
@@ -38,6 +43,11 @@ func main() {
 	// Check for configuration file
 	if len(*flagConfigFile) <= 0 {
 		log.Fatal("No configuration file found. Please add the --config parameter")
+	}
+
+	// PID-File
+	if len(*flagPidFile) > 0 {
+		ioutil.WriteFile(*flagPidFile, []byte(strconv.Itoa(os.Getpid())), 0644)
 	}
 
 	// Be nice to the user
