@@ -8,7 +8,6 @@ import (
 	"log"
 )
 
-// Global variable to store the configuration file
 var (
 	flagConfigFile *string
 	flagVersion    *bool
@@ -22,7 +21,7 @@ const (
 
 // Init function to define arguments
 func init() {
-	flagConfigFile = flag.String("config", "./config.json", "Configuration file")
+	flagConfigFile = flag.String("config", "", "Configuration file")
 	flagVersion = flag.Bool("version", false, "Outputs the version number and exits")
 }
 
@@ -34,6 +33,11 @@ func main() {
 	if *flagVersion {
 		fmt.Printf("gotrap v%d.%d.%d\n", MajorVersion, MinorVersion, PatchVersion)
 		return
+	}
+
+	// Check for configuration file
+	if len(*flagConfigFile) <= 0 {
+		log.Fatal("No configuration file found. Please add the --config parameter")
 	}
 
 	// Be nice to the user
