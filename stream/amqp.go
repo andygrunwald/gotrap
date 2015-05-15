@@ -35,7 +35,7 @@ func (s *AmqpStream) Start() error {
 		// If we don`t get a AMQP connection we can exit here
 		// Without AMQP connection gotrap is useless
 		if err := s.connect(); err != nil {
-			log.Fatalf("> AMQP connection not available: %v", err)
+			return err
 		}
 		defer s.Connection.Close()
 
@@ -116,16 +116,13 @@ func (s *AmqpStream) connect() error {
 	// Open an AMQP connection
 	s.Connection, err = amqp.Dial(s.URI.String())
 	if err != nil {
-		s.Connection.Close()
-		log.Fatalf("> AMQP Connection.open: %s", err)
 		return err
 	}
 
 	// Open the channel in the new connection
 	s.Channel, err = s.Connection.Channel()
 	if err != nil {
-		s.Channel.Close()
-		log.Fatalf("> AMQP Channel.open: %s", err)
+		s.Connection.Close()
 		return err
 	}
 
