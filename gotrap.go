@@ -14,9 +14,9 @@ var (
 )
 
 const (
-	MajorVersion = 1
-	MinorVersion = 0
-	PatchVersion = 0
+	majorVersion = 1
+	minorVersion = 0
+	patchVersion = 0
 )
 
 // Init function to define arguments
@@ -31,7 +31,7 @@ func main() {
 
 	// Output the version and exit
 	if *flagVersion {
-		fmt.Printf("gotrap v%d.%d.%d\n", MajorVersion, MinorVersion, PatchVersion)
+		fmt.Printf("gotrap v%d.%d.%d\n", majorVersion, minorVersion, patchVersion)
 		return
 	}
 
