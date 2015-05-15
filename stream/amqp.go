@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"encoding/json"
 	"github.com/andygrunwald/gotrap/config"
 	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/andygrunwald/gotrap/github"
@@ -65,12 +66,28 @@ func (s *AmqpStream) Start() error {
 					wg.Done()
 				}()
 
-				// Bootstrap the Github and Gerrit client ...
-				githubClient := *github.NewGithubClient(&s.Config.Github)
-				gerritClient := *gerrit.NewGerritClient(&s.Config.Gerrit)
+				// Acknowledge message if we get this
+				// We do this, because at the end of proceeding we might lost the connection to AMQP server
+				// I know this is wrong, but currently the reconnection does not work correctly :(
+				// TODO: Fix this later and Ack message if its done
+				event.Ack(false)
 
-				// ... and start handle the message!
-				handleNewMessage(githubClient, gerritClient, s.Config, event)
+				// Convert the AMQP into a Gerrit message
+				var change gerrit.Message
+				err := json.Unmarshal(event.Body, &change)
+				// If we can`t read the message, we will exit here
+				if err != nil {
+					return
+				}
+
+				// Build the main data structure and start working on the message :)
+				gotrap := Gotrap{
+					githubClient: *github.NewGithubClient(&s.Config.Github),
+					gerritClient: *gerrit.NewGerritClient(&s.Config.Gerrit),
+					config:       s.Config,
+					message:      change,
+				}
+				gotrap.TakeAction()
 			}()
 		}
 	}

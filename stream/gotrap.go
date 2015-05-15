@@ -1,38 +1,30 @@
 package stream
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/andygrunwald/gotrap/config"
 	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/andygrunwald/gotrap/github"
-	"github.com/streadway/amqp"
 	"log"
 	"strings"
 )
 
-func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance, c *config.Configuration, event amqp.Delivery) {
-	// Acknowledge message if we get this
-	// We do this, because at the end of proceeding we might lost the connection to AMQP server
-	// I know this is wrong, but currently the reconnection does not work correctly :(
-	// TODO: Fix this later and Ack message if its done
-	event.Ack(false)
+type Gotrap struct {
+	githubClient github.GithubClient
+	gerritClient gerrit.GerritInstance
+	config       *config.Configuration
+	message      gerrit.Message
+}
 
-	var change gerrit.Message
-
-	err := json.Unmarshal(event.Body, &change)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func (trap *Gotrap) TakeAction() {
 	// Stream events are documented
 	// See https://git.eclipse.org/r/Documentation/cmd-stream-events.html
-	switch change.Type {
+	switch trap.message.Type {
 	case "patchset-created":
-		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (\"%s\")", change.Patchset.Ref, change.Change.Project, change.Change.URL)
+		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (\"%s\")", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
 
-		if change.Change.Project != "Packages/TYPO3.CMS" {
-			log.Printf("> Project \"%s\" currently not supported. Only \"%s\"", change.Change.Project, "Packages/TYPO3.CMS")
+		if trap.message.Change.Project != "Packages/TYPO3.CMS" {
+			log.Printf("> Project \"%s\" currently not supported. Only \"%s\"", trap.message.Change.Project, "Packages/TYPO3.CMS")
 			return
 		}
 
@@ -43,13 +35,13 @@ func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance,
 		// The current patchset will be delivered later as message.
 		// So we won`t skip this changeset
 		// https://review.typo3.org/a/changes/I640486e9f32da6ac1eba05e3c38d15a0aba41055/?o=CURRENT_REVISION
-		if currentPatchset, _ := gerritClient.IsPatchsetTheCurrentPatchset(change.Change.ID, change.Patchset.Number); currentPatchset == false {
-			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s)", change.Patchset.Ref)
+		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(trap.message.Change.ID, trap.message.Patchset.Number); currentPatchset == false {
+			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s)", trap.message.Patchset.Ref)
 			return
 		}
 
 		// Create the pull request
-		pullRequest, err := g.CreatePullRequestForPatchset(&change)
+		pullRequest, err := trap.githubClient.CreatePullRequestForPatchset(&trap.message)
 		if err != nil {
 			// TODO: I don`t have an idea what to do if i fail to create a PR
 			log.Println("> Error during creating new pull request", err)
@@ -59,7 +51,7 @@ func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance,
 		log.Printf("> New pull request created: %s", *pullRequest.HTMLURL)
 
 		// Poll travis ci and wait until the PR got a status
-		s, _ := g.WaitUntilCommitStatusIsAvailable(*pullRequest)
+		s, _ := trap.githubClient.WaitUntilCommitStatusIsAvailable(*pullRequest)
 
 		var vote int
 		switch *s.State {
@@ -86,22 +78,22 @@ func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance,
 		}
 
 		// Build template for Gerrit vote action
-		msg := gerritClient.Template
+		msg := trap.gerritClient.Template
 		msg = strings.Replace(msg, "%state%", *s.State, 1)
 		msg = strings.Replace(msg, "%status%", strings.Join(statusDetails, "\n\n"), 1)
 		msg = strings.Replace(msg, "%pr%", *pullRequest.HTMLURL, 1)
 
 		// Post Command + Vote on Changeset
-		gerritClient.PostCommentOnChangeset(&change, vote, msg)
+		trap.gerritClient.PostCommentOnChangeset(&trap.message, vote, msg)
 
 		msg = "This PR will be closed, because the tests results were reported back to Gerrit. "
-		msg += fmt.Sprintf("See [%s](%s) for details.", change.Change.Subject, change.Change.URL)
+		msg += fmt.Sprintf("See [%s](%s) for details.", trap.message.Change.Subject, trap.message.Change.URL)
 
 		// TODO Add Details to Github Pull Request, before closing
 		// This does not work currently. I don`t have a clue why. Check this later ;)
-		g.AddCommentToPullRequest(pullRequest, msg)
+		trap.githubClient.AddCommentToPullRequest(pullRequest, msg)
 
-		g.ClosePullRequest(pullRequest)
+		trap.githubClient.ClosePullRequest(pullRequest)
 
 	case "change-abandoned":
 		// We have to close all PR`s
@@ -114,7 +106,7 @@ func handleNewMessage(g github.GithubClient, gerritClient gerrit.GerritInstance,
 		// topic-changed
 		// ....
 	default:
-		log.Printf("> Skipped AMQP message (uncovered message type: %s)\n", change.Type)
+		log.Printf("> Skipped AMQP message (uncovered message type: %s)\n", trap.message.Type)
 	}
 
 	return
