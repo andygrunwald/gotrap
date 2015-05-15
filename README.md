@@ -3,11 +3,12 @@
 [![Build Status](https://travis-ci.org/andygrunwald/gotrap.svg)](https://travis-ci.org/andygrunwald/gotrap)
 
 [Gerrit](https://code.google.com/p/gerrit/), a code review tool, is often used in bigger projects with self hosted infrastructure like [TYPO3](https://review.typo3.org/), [Android](https://android-review.googlesource.com/), [HPDD (Intel)](http://review.whamcloud.com/), [Qt](https://codereview.qt-project.org/), [OpenStack](https://review.openstack.org/) or [Golang](https://go-review.googlesource.com/).
-With a self hosted Git infrastructure there is no build in solution to use the continuous integration services like [Travis CI](https://travis-ci.org/).
+With a self hosted Git infrastructure there is no build in solution to benefit from hooks triggered by a Github Pull Request like the continuous integration service [Travis CI](https://travis-ci.org/) or similar.
 
 **gotrap** is a Gerrit <=> Github <=> TravisCI connection written in Go.
 
-PS: You don`t have to use TravisCI. You can use every service which can be triggered as pull request as github and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
+PS: You don`t have to use TravisCI. You can use every service which can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
+Travis CI is only used as an example, because it is one of the most popular.
 
 ## Features
 
@@ -28,7 +29,7 @@ Here are some examples how gotrap can look like:
 
 To run *gotrap* your Gerrit instance has to fulfil the requirements below, enable and configured two plugins:
 
-* [Gerrit](https://code.google.com/p/gerrit/) in >= v2.9.2 (TODO: Has to be checked)
+* [Gerrit](https://code.google.com/p/gerrit/) in >= v2.9.0 (tested with v2.9.2 & v2.9.4. May work with a lower version)
 * Gerrit plugin [gerrit-rabbitmq-plugin](https://github.com/rinrinne/gerrit-rabbitmq-plugin)
 * Gerrit plugin `replication`
 
@@ -88,23 +89,32 @@ true    | false      | false     | false
 
 ## Motivation
 
-I was active in the TYPO3 community some time ago and if th
+I was active in the TYPO3 community some time ago.
+Most of this time i was focusing on quality, testing, stability, (custom) tools and similar.
+Since TYPO3 was using Gerrit and TravisCI came up.
+For all other projects i started to love TravisCI and i thought it would be cool to get TravisCI-Support for Gerrit Changesets with a self hosted Git infrastructure.
+
+@StephenKing and me started to talk about this feature. And he liked this idea. Short after this chat i started hacking on this feature. This implementation was the most hackiest PHP code i ever wrote. This code never goes online.
+
+In February 2015 i met @StephenKing again at [Config Management Camp in Gent, Belgium](http://cfgmgmtcamp.eu/). We talked about this feature again and i started hacking. Again. But this time i wanted to learn a new language and was fascinated by [the go programming language](http://golang.org/).
+
+And here you see the result.
 
 ## Alternative implementations
 
-*gotrap* is maybe not the best solution for this job, but coding this was fun anyway. Have a look below for alternative / possible solution for this problem.
+*gotrap* is maybe not the best solution for this job, but coding this was fun anyway. Have a look below for alternative / possible solution for this problem i can think about.
 
-PS: If you had created such an alternative let me know :wink:
+PS: If you had created such an alternative or know a different way how to solve this problem, let me know. I will be happy to include your way :wink:
 
 ### Jenkins
 
-[Jenkins](http://jenkins-ci.org/) is a good tool to execute such work as well. A [Gerrit Trigger](https://wiki.jenkins-ci.org/display/JENKINS/Gerrit+Trigger) plugin already exists and works like a charm in several environments.
+[Jenkins](http://jenkins-ci.org/) is an awesome tool to execute such work as well. A [Gerrit Trigger](https://wiki.jenkins-ci.org/display/JENKINS/Gerrit+Trigger) plugin already exists and works like a charm in several environments.
 
-With the help of jenkins you can do the same communication like *gotrap* as well. 
-One benefit would be the log of the single actions / commands will be public visible. 
+With the help of jenkins you can do the same communication like *gotrap*. 
+One benefit over *gotrap* would be the log of the single actions / commands will be public visible. 
 Maybe helpful to get a better understanding of what is going on.
-With Jenkins you are not limited to TravisCI tests, but can extend your tests as you won\`t.
-The disadvantage is: You have to host and maintain a jenkins environment.
+With Jenkins you are not limited to TravisCI tests. You can add your tests as you want.
+The disadvantage is: You have to host and maintain a jenkins environment on your own.
 
 But have a look what cool things you can create with jenkins (e.g. DB Datasets CI check):
 
@@ -114,7 +124,7 @@ But have a look what cool things you can create with jenkins (e.g. DB Datasets C
 ### Gerrit plugin
 
 Gerrit support custom plugins written in Java.
-To run *gotrap* we require two (`gerrit-rabbitmq-plugin` + `replication`).
+To run *gotrap* we require two of them: `gerrit-rabbitmq-plugin` + `replication`.
 
 To transfer this logic to a custom Gerrit plugin would make sense.
 With this we don\`t depend on two plugins and a custom tool written in Go.
@@ -137,7 +147,7 @@ Because json parsing is a standard package in golang and build in into the langu
 ### Which AMQP broker are supported?
 
 [RabbitMQ](http://www.rabbitmq.com/) is the only official supported AMQP broker currently.
-Maybe it works with others as well, but the were not tested.
+Maybe it works with others as well, but this was not tested.
 
 ### What is about the Github API rate limit?
 
