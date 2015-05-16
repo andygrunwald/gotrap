@@ -24,7 +24,12 @@ func (trap *Gotrap) TakeAction() {
 		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (%s)", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
 
 		if _, err := trap.IsProjectConfigured(trap.message.Change.Project); err != nil {
-			log.Printf("> %s")
+			log.Printf("> %s", err)
+			return
+		}
+
+		if _, err := trap.IsBranchConfigured(trap.message.Change.Project, trap.message.Change.Branch); err != nil {
+			log.Printf("> %s", err)
 			return
 		}
 
@@ -126,4 +131,18 @@ func (trap *Gotrap) IsProjectConfigured(project string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (trap *Gotrap) IsBranchConfigured(project, branch string) (bool, error) {
+	// If no branch is configured, we assume that all branches should be covered
+	if len(trap.config.Gerrit.Projects[project]) == 0 {
+		return true, nil
+	}
+
+	// If the branch exists and is configured as true, then it is valid configured
+	if val, ok := trap.config.Gerrit.Projects[project][branch]; ok && val == true {
+		return true, nil
+	}
+
+	return false, fmt.Errorf("Branch \"%s\" not configured for project \"%s\"", branch, project)
 }
