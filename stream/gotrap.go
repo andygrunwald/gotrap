@@ -21,7 +21,7 @@ func (trap *Gotrap) TakeAction() {
 	// See https://git.eclipse.org/r/Documentation/cmd-stream-events.html
 	switch trap.message.Type {
 	case "patchset-created":
-		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (\"%s\")", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
+		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (%s)", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
 
 		// TODO Get rid of hardcoded TYPO3
 		if trap.message.Change.Project != "Packages/TYPO3.CMS" {
@@ -37,7 +37,7 @@ func (trap *Gotrap) TakeAction() {
 		// So we won`t skip this changeset
 		// https://review.typo3.org/a/changes/I640486e9f32da6ac1eba05e3c38d15a0aba41055/?o=CURRENT_REVISION
 		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(trap.message.Change.ID, trap.message.Patchset.Number); currentPatchset == false {
-			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s)", trap.message.Patchset.Ref)
+			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s of %s)", trap.message.Patchset.Ref, trap.message.Change.URL)
 			return
 		}
 
@@ -90,11 +90,19 @@ func (trap *Gotrap) TakeAction() {
 		msg = "This PR will be closed, because the tests results were reported back to Gerrit. "
 		msg += fmt.Sprintf("See [%s](%s) for details.", trap.message.Change.Subject, trap.message.Change.URL)
 
-		// TODO Add Details to Github Pull Request, before closing
-		// This does not work currently. I don`t have a clue why. Check this later ;)
-		trap.githubClient.AddCommentToPullRequest(pullRequest, msg)
+		_, err = trap.githubClient.AddCommentToPullRequest(pullRequest, msg)
+		if err != nil {
+			log.Printf("> Error during adding a comment to a pull request %s: %s", *pullRequest.HTMLURL, err)
+		} else {
+			log.Printf("> Comment added to pull request: %s", *pullRequest.HTMLURL)
+		}
 
-		trap.githubClient.ClosePullRequest(pullRequest)
+		_, err = trap.githubClient.ClosePullRequest(pullRequest)
+		if err != nil {
+			log.Printf("> Error during closing a pull request %s: %s", *pullRequest.HTMLURL, err)
+		} else {
+			log.Printf("> Pull request closed: %s", *pullRequest.HTMLURL)
+		}
 
 	case "change-abandoned":
 		// We have to close all PR`s

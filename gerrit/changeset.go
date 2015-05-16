@@ -18,13 +18,10 @@ func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, erro
 	req.SetBasicAuth(g.Username, g.Password)
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
 
-	log.Printf("> Getting details of change %s", changeID)
-
 	resp, err := client.Do(req)
 	defer resp.Body.Close()
 
 	if err != nil {
-		log.Println("> Call failed", err)
 		return nil, err
 	}
 
@@ -44,7 +41,6 @@ func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, erro
 
 	err = json.Unmarshal([]byte(jsonBody), &change)
 	if err != nil {
-		log.Fatal("> Reading JSON from Request failed", err)
 		return nil, err
 	}
 
