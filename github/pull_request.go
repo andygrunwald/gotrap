@@ -52,12 +52,11 @@ func (c GithubClient) CreatePullRequestForPatchset(m *gerrit.Message) (*github.P
 }
 
 func (c GithubClient) AddCommentToPullRequest(pr *github.PullRequest, message string) (bool, error) {
-
-	comment := &github.PullRequestComment{
+	comment := &github.IssueComment{
 		Body: &message,
 	}
-	_, resp, err := c.Client.PullRequests.CreateComment(c.Conf.Organisation, c.Conf.Repository, *pr.Number, comment)
-	// func (s *PullRequestsService) CreateComment(owner string, repo string, number int, comment *PullRequestComment) (*PullRequestComment, *Response, error)
+	_, resp, err := c.Client.Issues.CreateComment(c.Conf.Organisation, c.Conf.Repository, *pr.Number, comment)
+
 	if err != nil {
 		return false, err
 	}
@@ -67,7 +66,6 @@ func (c GithubClient) AddCommentToPullRequest(pr *github.PullRequest, message st
 }
 
 func (c GithubClient) ClosePullRequest(pr *github.PullRequest) (bool, error) {
-	// func (s *PullRequestsService) Edit(owner string, repo string, number int, pull *PullRequest) (*PullRequest, *Response, error)
 	state := "closed"
 	updatePr := &github.PullRequest{
 		State: &state,
