@@ -6,6 +6,7 @@ import (
 	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/andygrunwald/gotrap/github"
 	"log"
+	"regexp"
 	"strings"
 )
 
@@ -23,13 +24,21 @@ func (trap *Gotrap) TakeAction() {
 	case "patchset-created":
 		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (%s)", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
 
+		// Check if Project is configured
 		if _, err := trap.IsProjectConfigured(trap.message.Change.Project); err != nil {
 			log.Printf("> %s", err)
 			return
 		}
 
+		// Check if branch is configured
 		if _, err := trap.IsBranchConfigured(trap.message.Change.Project, trap.message.Change.Branch); err != nil {
 			log.Printf("> %s", err)
+			return
+		}
+
+		// Check if change subject is excluded
+		if res, matchedPattern := trap.IsSubjectExcludedByPattern(trap.message.Change.Subject); res == true {
+			log.Printf("> Subject \"%s\" excluded by pattern \"%s\"", trap.message.Change.Subject, matchedPattern)
 			return
 		}
 
@@ -145,4 +154,14 @@ func (trap *Gotrap) IsBranchConfigured(project, branch string) (bool, error) {
 	}
 
 	return false, fmt.Errorf("Branch \"%s\" not configured for project \"%s\"", branch, project)
+}
+
+func (trap *Gotrap) IsSubjectExcludedByPattern(subject string) (bool, string) {
+	for _, pattern := range trap.config.Gerrit.ExcludePattern {
+		if matched, err := regexp.MatchString(pattern, subject); err == nil && matched == true {
+			return matched, pattern
+		}
+	}
+
+	return false, ""
 }
