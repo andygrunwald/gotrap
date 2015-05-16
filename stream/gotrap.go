@@ -23,9 +23,8 @@ func (trap *Gotrap) TakeAction() {
 	case "patchset-created":
 		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (%s)", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
 
-		// TODO Get rid of hardcoded TYPO3
-		if trap.message.Change.Project != "Packages/TYPO3.CMS" {
-			log.Printf("> Project \"%s\" currently not supported. Only \"%s\"", trap.message.Change.Project, "Packages/TYPO3.CMS")
+		if _, err := trap.IsProjectConfigured(trap.message.Change.Project); err != nil {
+			log.Printf("> %s")
 			return
 		}
 
@@ -119,4 +118,12 @@ func (trap *Gotrap) TakeAction() {
 	}
 
 	return
+}
+
+func (trap *Gotrap) IsProjectConfigured(project string) (bool, error) {
+	if _, ok := trap.config.Gerrit.Projects[project]; !ok {
+		return false, fmt.Errorf("Project \"%s\" is not configured", project)
+	}
+
+	return true, nil
 }

@@ -44,10 +44,11 @@ type AmqpConfiguration struct {
 }
 
 type GerritConfiguration struct {
-	URL      string   `json:"url"`
-	Username string   `json:"username"`
-	Password string   `json:"password"`
-	Comment  []string `json:"comment"`
+	URL      string              `json:"url"`
+	Username string              `json:"username"`
+	Password string              `json:"password"`
+	Projects map[string][]string `json:"projects"`
+	Comment  []string            `json:"comment"`
 }
 
 func NewConfiguration(configFile *string) (*Configuration, error) {
