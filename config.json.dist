@@ -1,6 +1,6 @@
 {
   "gotrap": {
-    "concurrent": 2
+    "concurrent": 1
   },
 
   "github": {
@@ -49,6 +49,17 @@
 
     "username": "GERRIT-USERNAME",
     "password": "GERRIT-PASSWORD",
+
+    "projects": {
+      "PROJECT": {
+        "BRANCH-1": true,
+        "BRANCH-2": true
+      }
+    },
+
+    "exclude-pattern": [
+      "^\\[WIP\\].*"
+    ],
 
     "comment": [
       "Github tests: %state%",
