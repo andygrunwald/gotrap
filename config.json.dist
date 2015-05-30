@@ -32,7 +32,6 @@
   "amqp": {
     "host": "AMQP-HOST",
     "port": AMQP-PORT,
-
     "username": "AMQP-USERNAME",
     "password": "AMQP-PASSWORD",
 
