@@ -44,6 +44,118 @@ $ go build .
 
 ### gotrap `config.json`
 
+The main configuration file is *config.json*.
+You can copy the template *config.json.dist* and replace the default settings with your values.
+To use this file with *gotrap* please us the `--config` parameter.
+The configuration is splitted into various parts.
+Below you will find a description of every part and setting with examples.
+Words written in uppercase are "variables" which needs to be replaced by you (themy example values of course, too).
+
+If you got a question regarding the configuration please open an issue and we will answer it and extend the documentation.
+
+#### Configuration part `gotrap`
+
+```json
+"gotrap": {
+  "concurrent": 1
+}
+```
+
+*concurrent* is the number of Changesets / Merge Requests which are handled by *gotrap* in parallel.
+Please take in mind that this number depends on the [Per Repository Concurrency Setting of Travis CI](http://blog.travis-ci.com/2014-07-18-per-repository-concurrency-setting/).
+This is handled by a simple semaphore.
+
+#### Configuration part `github`
+
+```json
+"github": {
+  "username": "TYPO3-Bot",
+  "api-token": "GITHUB-API-TOKEN",
+
+  "organisation": "typo3-ci",
+  "repository": "TYPO3.CMS-pre-merge-tests",
+
+  "branch-polling-intervall": 15,
+  "status-polling-intervall": 30,
+
+  "pull-request": {
+    "title": "Gotrap: %title%",
+    "body": [
+      "%commit-msg%",
+      "",
+      "------",
+      "",
+      "Details: %url%",
+      "",
+      "------",
+      "",
+      "This PR was created (automatically) by [gotrap](https://github.com/andygrunwald/gotrap) with :heart: and :beer:"
+    ]
+  }
+},
+```
+
+TODO
+
+#### Configuration part `amqp`
+
+```json
+"amqp": {
+  "host": "mq.typo3.org",
+  "port": 5672,
+  "username": "AMQP-USERNAME",
+  "password": "AMQP-PASSWORD",
+
+  "vhost": "AMQP-VHOST",
+  "exchange": "AMQP-EXCHANGE",
+  "queue": "AMQP-QUEUE",
+  "routing-key": "AMQP-ROUTING-KEY",
+
+  "identifier": "gotrap"
+},
+```
+
+*gotrap* receives messages by AMQP.
+This settings are typical parts of a broker like [RabbitMQ](http://rabbitmq.com).
+The settings `host`, `port`, `username`, `password` and `vhost` are values to get access to the AMQP broker.
+`exchange` and `queue` are the components where the new created message by Gerrit will be stored.
+If the configured `exchange` and `queue` are not exists and the `username` got rights to create those, *gotrap* will create this components with the attributes described in the Gerrit plugin *gerrit-rabbitmq-plugin* chapter. If you create `exchange` and `queue` in advance, those have to match these attributes.
+
+`routing-key` depends on your AMQP and Gerrit plugin `gerrit-rabbitmq-plugin` configuration. If you don`t got a complex exchange <-> queue setup, a blank value is fine. In the most cases this value is an empty string.
+
+`identifier` is a string which assign a name to a client which will receive messages by AMQP. This is visible in the broker.
+
+#### Configuration part `gerrit`
+
+```json
+"gerrit": {
+  "url": "https://review.typo3.org/",
+
+  "username": "GERRIT-USERNAME",
+  "password": "GERRIT-PASSWORD",
+
+  "projects": {
+    "Packages/TYPO3.CMS": {
+      "master": true,
+      "TYPO3_6-2": true
+    }
+  },
+
+  "exclude-pattern": [
+    "^\\[WIP\\].*"
+  ],
+
+  "comment": [
+    "Github tests: %state%",
+    "",
+    "Pull request: %pr%",
+    "",
+    "",
+    "%status%"
+  ]
+}
+```
+
 TODO
 
 ### Gerrit plugin `replication`
