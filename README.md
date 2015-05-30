@@ -116,6 +116,8 @@ TODO
 ```
 
 *gotrap* receives messages by AMQP.
+The AMQP section contain settings for the AMQP broker.
+
 This settings are typical parts of a broker like [RabbitMQ](http://rabbitmq.com).
 The settings `host`, `port`, `username`, `password` and `vhost` are values to get access to the AMQP broker.
 `exchange` and `queue` are the components where the new created message by Gerrit will be stored.
@@ -156,7 +158,36 @@ If the configured `exchange` and `queue` are not exists and the `username` got r
 }
 ```
 
-TODO
+*gotrap* needs to communicate with a Gerrit instance.
+The gerrit section contain settings for the Gerrit instance.
+
+The `url` is the scheme + host + port fir the Gerrit instance.
+`username` and `password`are credentials which will be used to authentificate against the `url` Gerrit instance.
+Take in mind that the `username` needs access to the projects configured in `projects` to:
+
+* GET changeset information by REST endpoint `/changes/`
+* POST a comment to a changeset by REST endpoint `/changes/`
+
+The `projects` settings is a map to whitelist projects handled by *gotrap*.
+One Gerrit instance can handle multiple projects.
+One project can contain multiple branches.
+Sometimes you want to test only a few projects per Gerrit instance or a few branches per project.
+A branch (e.g. *master* or *TYPO3_6-2*) needs `true` as value.
+Otherwise the branch is configured, but disabled.
+
+Take in mind: Every `project` which should be handled by *gotrap* needs to be configured.
+If a project contains no branches, every branch will be handled by *gotrap*.
+If a project got minimum one branch configured, the "all branches are whitelisted" behaviour is disabled and every branch which should be handled by *gotrap* needs to be configured.
+
+In the `exclude-pattern` array you can configure regular expressions to exclude changesets of configured `project` / branches.
+With `"^\\[WIP\\].*"` you exclude all Changeset which are starts with "[WIP]" (e.g. [WIP] This is my not finished feature).
+WIP means *W*ork *I*n *P*rogress.
+
+`comment` is a multiline field.
+This text is used to post the results of the Github Pull Request (e.g. Travis CI) back to the Gerrit Changeset.
+You can customize this as you want.
+Parts enclosed by *%* are variables.
+Those will be replaced by *gotrap* with detail information.
 
 ### Gerrit plugin `replication`
 
