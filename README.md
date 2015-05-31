@@ -12,7 +12,12 @@ Travis CI is only used as an example, because it is one of the most popular.
 
 ## Features
 
-TODO
+* Gerrit support
+* Github support
+* Concurrency (can handle more than one changeset per time)
+* Multiple projects / branches support
+* Exclude changesets by regular expression
+* Templatable comments (Gerrit) and Merge Requests (Github)
 
 ## Examples
 
