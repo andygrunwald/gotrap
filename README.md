@@ -10,6 +10,34 @@ With a self hosted Git infrastructure there is no build in solution to benefit f
 PS: You don`t have to use TravisCI. You can use every service which can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
 Travis CI is only used as an example, because it is one of the most popular.
 
+## Table of contents
+
+1. [Features](#features)
+2. [Examples](#examples)
+3. [Requirements](#requirements)
+4. [Installation](#installation)
+5. [Configuration](#configuration)
+	1. [gotrap `config.json`](#gotrap-configjson)
+		1. [Configuration part `gotrap`](#configuration-part-gotrap)
+		2. [Configuration part `github`](#configuration-part-github)
+		3. [Configuration part `amqp`](#configuration-part-amqp)
+		4. [Configuration part `gerrit`](#configuration-part-gerrit)
+	2. [Gerrit plugin `replication`](#gerrit-plugin-replication)
+	3. [Gerrit plugin `gerrit-rabbitmq-plugin`](#gerrit-plugin-gerrit-rabbitmq-plugin)
+		1. [Exchange](#exchange)
+		2. [Queue](#queue)
+6. [Motivation](#motivation)
+7. [Alternative implementations](#alternative-implementations)
+	1. [Jenkins](#jenkins)
+	2. [Gerrit plugin](#gerrit-plugin)
+8. [FAQ](#faq)
+	1. [How does gotrap works?](#how-does-gotrap-works)
+	2. [Why JSON as config file format?](#why-json-as-config-file-format)
+	3. [Which AMQP broker are supported?](#which-amqp-broker-are-supported)
+	4. [What is about the Github API rate limit?](#what-is-about-the-github-api-rate-limit)
+	5. [Can i start multiple Travis CI tests in parallel?](#can-i-start-multiple-travis-ci-tests-in-parallel)
+9. [License](#license)
+
 ## Features
 
 * Gerrit support
