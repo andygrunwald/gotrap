@@ -95,7 +95,34 @@ This is handled by a simple semaphore.
 },
 ```
 
-TODO
+*gotrap* needs to create Merge Requests at Github to trigger services.
+The github section contain settings for the github connection.
+
+The `api-token` setting will be used to authenticate against Github *gotrap* with the use of [Personal API tokens](https://github.com/blog/1509-personal-api-tokens).
+This tokens are binded to the user.
+You have to create one in your [personal settings](https://github.com/settings/tokens).
+
+To trigger the actions / hooks (like TravisCI) a merge request must be created.
+`organisation` and `repository` name the repository where those merge requests will be created.
+The example shows the configuration for [typo3-ci/TYPO3.CMS-pre-merge-tests](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests).
+
+Before we can create a merge request in the repository named in `organisation` and `repository` we have to ensure that the new changeset, created in Gerrit earlier, is replicated to github.
+*gotrap* itself will not replicate git commits / changesets.
+*gotrap* only checks if the branch is already replicated.
+If this branch is not replicated yet, it will wait `branch-polling-intervall` seconds before the next check will be made.
+This will be repeated until the branch is replicated.
+
+When the branch is rpelicated and the merge request is created, the configured services (like Travis CI) will be triggered by github.
+If this services are finished with their work they will report back the results to the [Commit Status API](https://github.com/blog/1227-commit-status-api).
+*gotrap* has to check if this happens already.
+`status-polling-intervall` is the number in seconds for how long *gotrap* will wait until the next check will be done.
+This will be done until the services are finished.
+
+`pull-request` is a multiline field.
+This text is used as a template to define the Pull Request
+You can customize this as you want.
+Parts enclosed by *%* are variables.
+Those will be replaced by *gotrap* with detail information.
 
 #### Configuration part `amqp`
 
