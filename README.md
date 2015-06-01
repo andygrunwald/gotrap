@@ -377,8 +377,27 @@ Currently (2015-03-13) this are
 * Unauthenticated requests: 60 requests per hour
 
 *gotrap* needs an authentication at github to create pull requests.
+So we got 5.000 req / hour. Lets do a small calculation what this means:
 
-TODO Talk about timings and reqs per hour.
+Imagine it takes
+* 1 minute to synchronize your patchset to Github
+* 0 seconds until your Travis CI tests will start after a merge request
+* 30 seconds to execute your tests on Travis CI
+* 0 seconds to notify *gotrap* by AMQP message about a new patchset
+
+We configure `branch-polling-intervall` to `15` seconds and `status-polling-intervall` to `10` seconds.
+
+With this we get the following github requests until a result is pushed to Gerrit:
+
+* 4 requests to check if the branch is already synced
+* 1 request to create the merge request
+* 3 requests to check if Travis CI is already finished
+* 1 request to add a "closing comment" to the github merge request
+* 1 request to close the merge request
+
+In theory we can handle 5000 / 10 = **500 patchsets per hour**.
+Please take in mind that some requests go wrong or some actions took longer than expected (e.g. scheduling and starting your tests on Travis CI).
+So plan some "spare" requests in (production can be hard).
 
 ### Can i start multiple Travis CI tests in parallel?
 
