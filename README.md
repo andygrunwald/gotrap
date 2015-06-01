@@ -345,7 +345,19 @@ One disadvantages of this will be that you have to keep your plugin in sync with
 
 ### How does gotrap works?
 
-TODO
+[![How gotrap works](./docs/how-gotrap-works.png)](https://github.com/andygrunwald/gotrap)
+
+1. A contributer pushes a new Changeset or Patchset to Gerrit.
+2. The next two steps will be (nearly) done at the same time
+	1. The Gerrit plugin `gerrit-rabbitmq-plugin` will push a new event into the configured RabbitMQ broker.
+	2. The Gerrit plugin `replication` will synchronize the new Changeset or Patchset to the configured Github repository.
+3. *gotrap* will receive the pushed AMQP message.
+4. *gotrap* will check if the patchset from the AMQP event is the current patchset of the Changeset in Gerrit (sometimes contributer pushes new patchset really fast and before we started working on the first message. To avoid "double work" we got this sanity check).
+5. *gotrap* checks if the patchset is already synced as branch and creates a new merge request.
+6. Github will trigger Travis CI.
+7. If Travis CI is finished, it will report back the results to the Commit Status API. 
+8. Until Travis CI is done *gotrap* will check (via long polling) if Travis CI reports the results already.
+9. *gotrap* post the results of the Commit Status API as comment in the Changeset of Gerrit and closes the pull request on github.
 
 ### Why JSON as config file format?
 
