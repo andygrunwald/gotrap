@@ -7,6 +7,10 @@ With a self hosted Git infrastructure there is no build in solution to benefit f
 
 **gotrap** is a Gerrit <=> Github <=> TravisCI connection written in Go.
 
+[![How gotrap works](./docs/how-gotrap-works.png)](https://github.com/andygrunwald/gotrap)
+
+A detailed description about every step you can find in [How does gotrap works?](#how-does-gotrap-works).
+
 PS: You don`t have to use TravisCI. You can use every service which can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
 Travis CI is only used as an example, because it is one of the most popular.
 
