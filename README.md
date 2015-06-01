@@ -5,7 +5,7 @@
 [Gerrit](https://code.google.com/p/gerrit/), a code review tool, is often used in bigger projects with self hosted infrastructure like [TYPO3](https://review.typo3.org/), [Android](https://android-review.googlesource.com/), [HPDD (Intel)](http://review.whamcloud.com/), [Qt](https://codereview.qt-project.org/), [OpenStack](https://review.openstack.org/) or [Golang](https://go-review.googlesource.com/).
 With a self hosted Git infrastructure there is no build in solution to benefit from hooks triggered by a Github Pull Request like the continuous integration service [Travis CI](https://travis-ci.org/) or similar.
 
-**gotrap** is a Gerrit <=> Github <=> TravisCI connection written in Go.
+**gotrap** is a Gerrit <=> Github <=> TravisCI bridge written in Go.
 
 [![How gotrap works](./docs/how-gotrap-works.png)](#how-does-gotrap-works)
 
