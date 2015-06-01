@@ -7,7 +7,7 @@ With a self hosted Git infrastructure there is no build in solution to benefit f
 
 **gotrap** is a Gerrit <=> Github <=> TravisCI connection written in Go.
 
-[![How gotrap works](./docs/how-gotrap-works.png)](https://github.com/andygrunwald/gotrap)
+[![How gotrap works](./docs/how-gotrap-works.png)](#how-does-gotrap-works)
 
 A detailed description about every step you can find in [How does gotrap works?](#how-does-gotrap-works).
 
@@ -345,7 +345,7 @@ One disadvantages of this will be that you have to keep your plugin in sync with
 
 ### How does gotrap works?
 
-[![How gotrap works](./docs/how-gotrap-works.png)](https://github.com/andygrunwald/gotrap)
+[![How gotrap works](./docs/how-gotrap-works.png)](#how-does-gotrap-works)
 
 1. A contributer pushes a new Changeset or Patchset to Gerrit.
 2. The next two steps will be (nearly) done at the same time
