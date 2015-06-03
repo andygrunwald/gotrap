@@ -30,17 +30,18 @@ Travis CI is only used as an example, because it is one of the most popular.
 	3. [Gerrit plugin `gerrit-rabbitmq-plugin`](#gerrit-plugin-gerrit-rabbitmq-plugin)
 		1. [Exchange](#exchange)
 		2. [Queue](#queue)
-6. [Motivation](#motivation)
-7. [Alternative implementations](#alternative-implementations)
+6. Source code documentation
+7. [Motivation](#motivation)
+8. [Alternative implementations](#alternative-implementations)
 	1. [Jenkins](#jenkins)
 	2. [Gerrit plugin](#gerrit-plugin)
-8. [FAQ](#faq)
+9. [FAQ](#faq)
 	1. [How does gotrap works?](#how-does-gotrap-works)
 	2. [Why JSON as config file format?](#why-json-as-config-file-format)
 	3. [Which AMQP broker are supported?](#which-amqp-broker-are-supported)
 	4. [What is about the Github API rate limit?](#what-is-about-the-github-api-rate-limit)
 	5. [Can i start multiple Travis CI tests in parallel?](#can-i-start-multiple-travis-ci-tests-in-parallel)
-9. [License](#license)
+10. [License](#license)
 
 ## Features
 
@@ -293,6 +294,11 @@ fanout  | false   | false      | false    | false
 durable | autoDelete | exclusive | noWait
 ------- | ---------- | --------- | ------
 true    | false      | false     | false
+
+## Source code documentation
+
+The source code itself is documented with [godoc](http://godoc.org/golang.org/x/tools/cmd/godoc) according their [standards](http://blog.golang.org/godoc-documenting-go-code).
+You can see it at [gotrap @ godoc](https://godoc.org/github.com/andygrunwald/gotrap).
 
 ## Motivation
 
