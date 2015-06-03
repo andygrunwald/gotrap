@@ -20,7 +20,8 @@ Travis CI is only used as an example, because it is one of the most popular.
 2. [Examples](#examples)
 3. [Requirements](#requirements)
 4. [Installation](#installation)
-5. [Configuration](#configuration)
+5. [Usage](#usage)
+6. [Configuration](#configuration)
 	1. [gotrap `config.json`](#gotrap-configjson)
 		1. [Configuration part `gotrap`](#configuration-part-gotrap)
 		2. [Configuration part `github`](#configuration-part-github)
@@ -30,18 +31,18 @@ Travis CI is only used as an example, because it is one of the most popular.
 	3. [Gerrit plugin `gerrit-rabbitmq-plugin`](#gerrit-plugin-gerrit-rabbitmq-plugin)
 		1. [Exchange](#exchange)
 		2. [Queue](#queue)
-6. [Source code documentation](#source-code-documentation)
-7. [Motivation](#motivation)
-8. [Alternative implementations](#alternative-implementations)
+7. [Source code documentation](#source-code-documentation)
+8. [Motivation](#motivation)
+9. [Alternative implementations](#alternative-implementations)
 	1. [Jenkins](#jenkins)
 	2. [Gerrit plugin](#gerrit-plugin)
-9. [FAQ](#faq)
+10. [FAQ](#faq)
 	1. [How does gotrap works?](#how-does-gotrap-works)
 	2. [Why JSON as config file format?](#why-json-as-config-file-format)
 	3. [Which AMQP broker are supported?](#which-amqp-broker-are-supported)
 	4. [What is about the Github API rate limit?](#what-is-about-the-github-api-rate-limit)
 	5. [Can i start multiple Travis CI tests in parallel?](#can-i-start-multiple-travis-ci-tests-in-parallel)
-10. [License](#license)
+11. [License](#license)
 
 ## Features
 
@@ -77,6 +78,28 @@ To run *gotrap* your Gerrit instance has to fulfil the requirements below, enabl
 $ go get
 $ go build .
 ```
+
+## Usage
+
+Trigger the help with:
+
+```sh
+$ gotrap -h
+Usage of ./gotrap:
+  -config="": Path to configuration file.
+  -pidfile="": Write the process id into a given file.
+  -version=false: Outputs the version number and exits.
+```
+
+`-config` is a required setting.
+Without a configuration file *gotrap* won`t start.
+Please have a look at the [Configuration](#configuration) chapter how to configure *gotrap* properly.
+
+`-pidfile` will wrote the process id of the running *gotrap* process into the given file.
+This can be used to monitor *gotrap* via [Nagios](https://www.nagios.org/), [Icinga](https://www.icinga.org/) or something similar.
+
+`--version` won`t start gotrap as described.
+This will only output the current version number of *gotrap* like `gotrap v1.0.0`.
 
 ## Configuration
 

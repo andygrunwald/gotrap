@@ -25,9 +25,9 @@ const (
 )
 
 func init() {
-	flagConfigFile = flag.String("config", "", "Configuration file")
-	flagPidFile = flag.String("pidfile", "", "Write the process id into a given file")
-	flagVersion = flag.Bool("version", false, "Outputs the version number and exits")
+	flagConfigFile = flag.String("config", "", "Path to configuration file.")
+	flagPidFile = flag.String("pidfile", "", "Write the process id into a given file.")
+	flagVersion = flag.Bool("version", false, "Outputs the version number and exits.")
 }
 
 // main is the heart of gotrap.
