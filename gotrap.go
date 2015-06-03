@@ -1,3 +1,4 @@
+// gotrap - A Gerrit <=> Github <=> TravisCI bridge
 package main
 
 import (
@@ -23,14 +24,13 @@ const (
 	patchVersion = 0
 )
 
-// Init function to define arguments
 func init() {
 	flagConfigFile = flag.String("config", "", "Configuration file")
 	flagPidFile = flag.String("pidfile", "", "Write the process id into a given file")
 	flagVersion = flag.Bool("version", false, "Outputs the version number and exits")
 }
 
-// The heart of gotrap.
+// main is the heart of gotrap.
 func main() {
 	flag.Parse()
 

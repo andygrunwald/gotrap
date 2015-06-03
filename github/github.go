@@ -1,3 +1,5 @@
+// Package github provides all functionality to interact with github in point of view of gotrap.
+// This includes getting the commit status of a merge request or create a new merge request.
 package github
 
 import (
@@ -6,7 +8,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// GithubClient offers the functionality to communicate with Github
+// GithubClient is the main data structure to interact with github.
+// Client is to interact with github itself.
+// Conf contains the github configuration.
 type GithubClient struct {
 	Client *github.Client
 	Conf   *config.GithubConfiguration
@@ -22,19 +26,16 @@ func (t *tokenSource) Token() (*oauth2.Token, error) {
 	return t.token, nil
 }
 
-// NewGithubClient will return a new Github client
+// NewGithubClient will return a client to interact with Github.
+// As an argument the github part of the configuration is necessary.
 func NewGithubClient(conf *config.GithubConfiguration) *GithubClient {
-
 	transport := &tokenSource{
 		token: &oauth2.Token{AccessToken: conf.APIToken},
 	}
-
 	transportClient := oauth2.NewClient(oauth2.NoContext, transport)
 
-	c := github.NewClient(transportClient)
-
 	client := &GithubClient{
-		Client: c,
+		Client: github.NewClient(transportClient),
 		Conf:   conf,
 	}
 
