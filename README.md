@@ -30,7 +30,7 @@ Travis CI is only used as an example, because it is one of the most popular.
 	3. [Gerrit plugin `gerrit-rabbitmq-plugin`](#gerrit-plugin-gerrit-rabbitmq-plugin)
 		1. [Exchange](#exchange)
 		2. [Queue](#queue)
-6. Source code documentation
+6. [Source code documentation](#source-code-documentation)
 7. [Motivation](#motivation)
 8. [Alternative implementations](#alternative-implementations)
 	1. [Jenkins](#jenkins)
