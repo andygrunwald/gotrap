@@ -43,6 +43,7 @@ Travis CI is only used as an example, because it is one of the most popular.
 	4. [What is about the Github API rate limit?](#what-is-about-the-github-api-rate-limit)
 	5. [Can i start multiple Travis CI tests in parallel?](#can-i-start-multiple-travis-ci-tests-in-parallel)
 11. [License](#license)
+12. [Credits](#credits)
 
 ## Features
 
@@ -437,3 +438,7 @@ See [Per Repository Concurrency Setting](http://blog.travis-ci.com/2014-07-18-pe
 ## License
 
 This project is released under the terms of the [MIT license](http://en.wikipedia.org/wiki/MIT_License).
+
+## Credits
+
+* [Wilson Joseph](https://thenounproject.com/wilsonjoseph/) for his [User-Icon from The Noun Project](https://thenounproject.com/search/?q=developer&i=27713) used in the [How does gotrap works?](#how-does-gotrap-works) image
