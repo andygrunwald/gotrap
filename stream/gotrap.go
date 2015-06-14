@@ -92,6 +92,7 @@ func (trap *Gotrap) TakeAction() {
 		}
 
 		// Build template for Gerrit vote action
+		// TODO: Replace message with text/template
 		msg := trap.gerritClient.Template
 		msg = strings.Replace(msg, "%state%", *s.State, 1)
 		msg = strings.Replace(msg, "%status%", strings.Join(statusDetails, "\n\n"), 1)
@@ -100,6 +101,8 @@ func (trap *Gotrap) TakeAction() {
 		// Post Command + Vote on Changeset
 		trap.gerritClient.PostCommentOnChangeset(&trap.message, vote, msg)
 
+		// TODO: Replace message with text/template
+		// TODO: Make text configurable
 		msg = "This PR will be closed, because the tests results were reported back to Gerrit. "
 		msg += fmt.Sprintf("See [%s](%s) for details.", trap.message.Change.Subject, trap.message.Change.URL)
 
