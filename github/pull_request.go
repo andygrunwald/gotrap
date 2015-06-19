@@ -38,18 +38,23 @@ func (c GithubClient) CreatePullRequestForPatchset(m *gerrit.Message) (*github.P
 	}
 	title := titleBuffer.String()
 
-	body := strings.Join(c.Conf.PRTemplate.Body, "\n")
-	body = strings.Replace(body, "%commit-msg%", m.Change.CommitMessage, 1)
-	body = strings.Replace(body, "%url%", m.Change.URL, 1)
+	// Build body for Pull Request
+	bodyString := strings.Join(c.Conf.PRTemplate.Body, "\n")
+	bodyBuffer := new(bytes.Buffer)
+	var bodyTemplate = template.Must(template.New("pull-request-body").Parse(bodyString))
+	err = bodyTemplate.Execute(bodyBuffer, m)
+	if err != nil {
+		return nil, err
+	}
+	body := bodyBuffer.String()
 
+	// Create the pull request itself
 	pr := &github.NewPullRequest{
 		Title: &title,
 		Head:  &baseRef,
 		Base:  &m.Change.Branch,
 		Body:  &body,
 	}
-
-	// Do the pull request itself
 	prResult, resp, err := c.Client.PullRequests.Create(c.Conf.Organisation, c.Conf.Repository, pr)
 	if err != nil {
 		return nil, err
