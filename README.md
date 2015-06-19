@@ -280,21 +280,20 @@ Those will be replaced by *gotrap* with detail information.
 
 ### Gerrit plugin `replication`
 
-All Changesets (including patchsets) has to be replicated to Github as branches. Otherwise we won`t be able to create pull requests.
+All changesets (including patchsets) have to be replicated to Github as branches. Otherwise we won`t be able to create pull requests.
 
-Example configuration:
+Example configuration (`etc/replication.config`):
 ```
 [remote "github/TYPO3-ci/TYPO3.CMS-pre-merge-tests"]
   projects = Packages/TYPO3.CMS
   url = https://github.com/TYPO3-ci/TYPO3.CMS-pre-merge-tests.git
   push = +refs/changes/*:refs/heads/changes/*
-  authGroup = Git Mirror
+  push = +refs/heads/*:refs/heads/*
+  push = +refs/tags/*:refs/tags/*
   mirror = true
-  timeout = 120
 ```
 
-The most important part of this configuration is the `push` property.
-This setting says that `refs/changes/` will be replicated to `refs/heads/changes`.
+The most important part of this configuration is the `push` property referencing the `refs/changes/*` refspec and pushing it as branches (`refs/heads/*). If this option would be omitted, all commits will be replicated, however Github will not notify any services.
 
 The Gerrit changeset ref `refs/changes/51/36451/8` will be appear as branch `changes/51/36451/8` on Github.
 In the example above in the Github repository [typo3-ci/TYPO3.CMS-pre-merge-tests](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests).
