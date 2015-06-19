@@ -123,7 +123,7 @@ If you have any question regarding the configuration, please open an issue. We w
 }
 ```
 
-*concurrent* specifies the number of changesets / merge requests which are handled by *gotrap* in parallel.
+`concurrent` specifies the number of changesets / merge requests which are handled by *gotrap* in parallel.
 Please take in mind that this number depends on the [Per Repository Concurrency Setting of Travis CI](http://blog.travis-ci.com/2014-07-18-per-repository-concurrency-setting/).
 This is handled by a simple semaphore.
 
