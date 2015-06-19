@@ -85,7 +85,7 @@ func (s *AmqpStream) Start() error {
 					githubClient: *github.NewGithubClient(&s.Config.Github),
 					gerritClient: *gerrit.NewGerritClient(&s.Config.Gerrit),
 					config:       s.Config,
-					message:      change,
+					Message:      change,
 				}
 				gotrap.TakeAction()
 			}()

@@ -1,6 +1,7 @@
 package stream
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/andygrunwald/gotrap/config"
 	"github.com/andygrunwald/gotrap/gerrit"
@@ -8,37 +9,38 @@ import (
 	"log"
 	"regexp"
 	"strings"
+	"text/template"
 )
 
 type Gotrap struct {
 	githubClient github.GithubClient
 	gerritClient gerrit.GerritInstance
 	config       *config.Configuration
-	message      gerrit.Message
+	Message      gerrit.Message
 }
 
 func (trap *Gotrap) TakeAction() {
 	// Stream events are documented
 	// See https://git.eclipse.org/r/Documentation/cmd-stream-events.html
-	switch trap.message.Type {
+	switch trap.Message.Type {
 	case "patchset-created":
-		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (%s)", trap.message.Patchset.Ref, trap.message.Change.Project, trap.message.Change.URL)
+		log.Printf("> New patchset-created message incoming for ref \"%s\" in \"%s\" (%s)", trap.Message.Patchset.Ref, trap.Message.Change.Project, trap.Message.Change.URL)
 
 		// Check if Project is configured
-		if _, err := trap.IsProjectConfigured(trap.message.Change.Project); err != nil {
+		if _, err := trap.IsProjectConfigured(trap.Message.Change.Project); err != nil {
 			log.Printf("> %s", err)
 			return
 		}
 
 		// Check if branch is configured
-		if _, err := trap.IsBranchConfigured(trap.message.Change.Project, trap.message.Change.Branch); err != nil {
+		if _, err := trap.IsBranchConfigured(trap.Message.Change.Project, trap.Message.Change.Branch); err != nil {
 			log.Printf("> %s", err)
 			return
 		}
 
 		// Check if change subject is excluded
-		if res, matchedPattern := trap.IsSubjectExcludedByPattern(trap.message.Change.Subject); res == true {
-			log.Printf("> Subject \"%s\" excluded by pattern \"%s\"", trap.message.Change.Subject, matchedPattern)
+		if res, matchedPattern := trap.IsSubjectExcludedByPattern(trap.Message.Change.Subject); res == true {
+			log.Printf("> Subject \"%s\" excluded by pattern \"%s\"", trap.Message.Change.Subject, matchedPattern)
 			return
 		}
 
@@ -49,13 +51,13 @@ func (trap *Gotrap) TakeAction() {
 		// The current patchset will be delivered later as message.
 		// So we won`t skip this changeset
 		// https://review.typo3.org/a/changes/I640486e9f32da6ac1eba05e3c38d15a0aba41055/?o=CURRENT_REVISION
-		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(trap.message.Change.ID, trap.message.Patchset.Number); currentPatchset == false {
-			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s of %s)", trap.message.Patchset.Ref, trap.message.Change.URL)
+		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(trap.Message.Change.ID, trap.Message.Patchset.Number); currentPatchset == false {
+			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s of %s)", trap.Message.Patchset.Ref, trap.Message.Change.URL)
 			return
 		}
 
 		// Create the pull request
-		pullRequest, err := trap.githubClient.CreatePullRequestForPatchset(&trap.message)
+		pullRequest, err := trap.githubClient.CreatePullRequestForPatchset(&trap.Message)
 		if err != nil {
 			// TODO: I don`t have an idea what to do if i fail to create a PR
 			log.Println("> Error during creating new pull request", err)
@@ -99,14 +101,21 @@ func (trap *Gotrap) TakeAction() {
 		msg = strings.Replace(msg, "%pr%", *pullRequest.HTMLURL, 1)
 
 		// Post Command + Vote on Changeset
-		trap.gerritClient.PostCommentOnChangeset(&trap.message, vote, msg)
+		trap.gerritClient.PostCommentOnChangeset(&trap.Message, vote, msg)
 
-		// TODO: Replace message with text/template
 		// TODO: Make text configurable
-		msg = "This PR will be closed, because the tests results were reported back to Gerrit. "
-		msg += fmt.Sprintf("See [%s](%s) for details.", trap.message.Change.Subject, trap.message.Change.URL)
+		msg = "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.message.Change.Subject}}]({{.message.Change.URL}}) for details."
 
-		_, err = trap.githubClient.AddCommentToPullRequest(pullRequest, msg)
+		// Build message to close the Pull Request
+		closeMsgBuffer := new(bytes.Buffer)
+		var closeMsgTemplate = template.Must(template.New("pull-request-close-message").Parse(msg))
+		err = closeMsgTemplate.Execute(closeMsgBuffer, trap)
+		if err != nil {
+			log.Println("> Error during prepare the pull request close message", err)
+			return
+		}
+
+		_, err = trap.githubClient.AddCommentToPullRequest(pullRequest, closeMsgBuffer.String())
 		if err != nil {
 			log.Printf("> Error during adding a comment to a pull request %s: %s", *pullRequest.HTMLURL, err)
 		} else {
@@ -131,7 +140,7 @@ func (trap *Gotrap) TakeAction() {
 		// topic-changed
 		// ....
 	default:
-		log.Printf("> Skipped AMQP message (uncovered message type: %s)\n", trap.message.Type)
+		log.Printf("> Skipped AMQP message (uncovered message type: %s)\n", trap.Message.Type)
 	}
 
 	return
