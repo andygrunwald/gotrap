@@ -1,10 +1,12 @@
 package github
 
 import (
+	"bytes"
 	"errors"
 	"github.com/andygrunwald/gotrap/gerrit"
 	"github.com/google/go-github/github"
 	"strings"
+	"text/template"
 )
 
 // createPullRequestForPatchset will create a new Pull Request at Github
@@ -27,8 +29,14 @@ func (c GithubClient) CreatePullRequestForPatchset(m *gerrit.Message) (*github.P
 		return nil, errors.New("Max loop reached for branch")
 	}
 
-	title := c.Conf.PRTemplate.Title
-	title = strings.Replace(title, "%title%", m.Change.Subject, 1)
+	// Build title for Pull Request
+	titleBuffer := new(bytes.Buffer)
+	var titleTemplate = template.Must(template.New("pull-request-title").Parse(c.Conf.PRTemplate.Title))
+	err = titleTemplate.Execute(titleBuffer, m)
+	if err != nil {
+		return nil, err
+	}
+	title := titleBuffer.String()
 
 	body := strings.Join(c.Conf.PRTemplate.Body, "\n")
 	body = strings.Replace(body, "%commit-msg%", m.Change.CommitMessage, 1)
