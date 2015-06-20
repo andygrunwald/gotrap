@@ -10,9 +10,9 @@ Using such a self hosted Git infrastructure resp. Gerrit, there is no built-in s
 
 [![How gotrap works](./docs/how-gotrap-works.png)](#how-does-gotrap-works)
 
-A detailed description about every step can be find in [How gotrap works?](#how-gotrap-works).
+A detailed description about every step can be found in [How gotrap works?](#how-gotrap-works).
 
-PS: You are not limited touse Travis CI. You can use every service that can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
+PS: You are not limited to use Travis CI. You can use every service that can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
 Travis CI is only used as an example, because it is one of the most popular.
 
 ## Table of contents
@@ -53,7 +53,7 @@ Travis CI is only used as an example, because it is one of the most popular.
 * Concurrency (can handle more than one changeset per time)
 * Multiple projects / branches support
 * Exclude changesets by regular expression
-* Templatable comments (Gerrit) and Merge Requests (Github)
+* Templatable comments (Gerrit) and Pull Requests (Github)
 
 ## Examples
 
@@ -123,7 +123,7 @@ If you have any question regarding the configuration, please open an issue. We w
 }
 ```
 
-`concurrent` specifies the number of changesets / merge requests which are handled by *gotrap* in parallel.
+`concurrent` specifies the number of changesets / pull requests which are handled by *gotrap* in parallel.
 Please take in mind that this number depends on the [Per Repository Concurrency Setting of Travis CI](http://blog.travis-ci.com/2014-07-18-per-repository-concurrency-setting/).
 This is handled by a simple semaphore.
 
@@ -157,7 +157,7 @@ This is handled by a simple semaphore.
 },
 ```
 
-*gotrap* needs to create merge requests at Github to trigger services.
+*gotrap* needs to create pull requests at Github to trigger services.
 The `github` section contains settings for the connection to Github.
 
 The `api-token` setting will be used to authenticate against Github using [Personal API tokens](https://github.com/blog/1509-personal-api-tokens).
@@ -165,7 +165,7 @@ These tokens are bound to a user.
 You have to create one in your [personal settings](https://github.com/settings/tokens).
 
 To trigger the actions / hooks (like for running Travis CI), a merge request on Github must be created.
-`organisation` and `repository` name the repository, where those merge requests will be created.
+`organisation` and `repository` name the repository, where those pull requests will be created.
 The example shows the configuration for [typo3-ci/TYPO3.CMS-pre-merge-tests](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests).
 
 Before we can create a merge request in the repository specified in `organisation`/ `repository`, we have to ensure that the changesets, which are created in Gerrit, are replicated to Github.
@@ -319,7 +319,7 @@ You can see it at [gotrap @ godoc](https://godoc.org/github.com/andygrunwald/got
 I was active in the TYPO3 community some time ago.
 Most of this time, I was focusing on quality, testing, stability, (custom) tools and similar.
 Since TYPO3 was using Gerrit and Travis CI came up.
-For all other projects I, started to love Travis CI and I thought it would be cool to get Travis CI-Support for Gerrit changesets with a self-hosted Git infrastructure.
+For all other projects, I started to love Travis CI and I thought it would be cool to get Travis CI-Support for Gerrit changesets with a self-hosted Git infrastructure.
 
 [Steffen Gebert](https://github.com/StephenKing) and me started to talk about this feature. And he liked this idea. Short after this chat I started hacking on this feature. This implementation was the most hackiest PHP code i ever wrote. This code never goes online.
 
@@ -419,10 +419,10 @@ In theory, we can thus handle 5000 / 10 = **500 patchsets per hour**.
 Please keep in mind that some requests go wrong or some actions took longer than expected (e.g. scheduling and starting your tests on Travis CI).
 So plan some "spare" requests in (production can be hard).
 
-### Can I Start Multiple Travis CI Tests in pParallel?
+### Can I Start Multiple Travis CI Tests in Parallel?
 
 Yes, you can.
-You need to raise the `Concurrent jobs` setting at Travi sCI.
+You need to raise the `Concurrent jobs` setting at Travis CI.
 See [Per Repository Concurrency Setting](http://blog.travis-ci.com/2014-07-18-per-repository-concurrency-setting/) at the Travis CI blog.
 
 ## License
@@ -431,4 +431,4 @@ This project is released under the terms of the [MIT license](http://en.wikipedi
 
 ## Credits
 
-* [Wilson Joseph](https://thenounproject.com/wilsonjoseph/) for his [User-Icon from The Noun Project](https://thenounproject.com/search/?q=developer&i=27713) used in the [How gotrap works?](#how-gotrap-works) image
+* [Wilson Joseph](https://thenounproject.com/wilsonjoseph/) for his [User-Icon from The Noun Project](https://thenounproject.com/search/?q=developer&i=27713) used in the [How gotrap works](#how-gotrap-works) image
