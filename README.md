@@ -2,16 +2,17 @@
 
 [![Build Status](https://travis-ci.org/andygrunwald/gotrap.svg?branch=master)](https://travis-ci.org/andygrunwald/gotrap)
 
-[Gerrit](https://code.google.com/p/gerrit/), a code review tool, is often used in bigger projects with self hosted infrastructure like [TYPO3](https://review.typo3.org/), [Android](https://android-review.googlesource.com/), [HPDD (Intel)](http://review.whamcloud.com/), [Qt](https://codereview.qt-project.org/), [OpenStack](https://review.openstack.org/) or [Golang](https://go-review.googlesource.com/).
-With a self hosted Git infrastructure there is no build in solution to benefit from hooks triggered by a Github Pull Request like the continuous integration service [Travis CI](https://travis-ci.org/) or similar.
+[Gerrit](https://code.google.com/p/gerrit/), a code review tool, is often used in bigger projects with self-hosted infrastructure like [TYPO3](https://review.typo3.org/), [Android](https://android-review.googlesource.com/), [HPDD (Intel)](http://review.whamcloud.com/), [Qt](https://codereview.qt-project.org/), [OpenStack](https://review.openstack.org/) or [Golang](https://go-review.googlesource.com/).
 
-**gotrap** is a Gerrit <=> Github <=> TravisCI bridge written in Go.
+Using such a self hosted Git infrastructure resp. Gerrit, there is no built-in solution to benefit from hooks triggered by a Github Pull Request, like the continuous integration service [Travis CI](https://travis-ci.org/) or similar.
+
+**gotrap** is a Gerrit <=> Github <=> Travis CI bridge written in Go.
 
 [![How gotrap works](./docs/how-gotrap-works.png)](#how-does-gotrap-works)
 
-A detailed description about every step you can find in [How does gotrap works?](#how-does-gotrap-works).
+A detailed description about every step can be found in [How gotrap works?](#how-gotrap-works).
 
-PS: You don`t have to use TravisCI. You can use every service which can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
+PS: You are not limited to use Travis CI. You can use every service that can be triggered by a pull request and reports back to the [commit status api](https://developer.github.com/v3/repos/statuses/) :wink:
 Travis CI is only used as an example, because it is one of the most popular.
 
 ## Table of contents
@@ -37,7 +38,7 @@ Travis CI is only used as an example, because it is one of the most popular.
 	1. [Jenkins](#jenkins)
 	2. [Gerrit plugin](#gerrit-plugin)
 10. [FAQ](#faq)
-	1. [How does gotrap works?](#how-does-gotrap-works)
+	1. [How gotrap works](#how-gotrap-works)
 	2. [Why JSON as config file format?](#why-json-as-config-file-format)
 	3. [Which AMQP broker are supported?](#which-amqp-broker-are-supported)
 	4. [What is about the Github API rate limit?](#what-is-about-the-github-api-rate-limit)
@@ -52,11 +53,11 @@ Travis CI is only used as an example, because it is one of the most popular.
 * Concurrency (can handle more than one changeset per time)
 * Multiple projects / branches support
 * Exclude changesets by regular expression
-* Templatable comments (Gerrit) and Merge Requests (Github)
+* Templatable comments (Gerrit) and Pull Requests (Github)
 
 ## Examples
 
-Here are some examples how gotrap can look like:
+Here are some examples, how gotrap can look like:
 
 * [[BUGFIX] SelectViewHelper must respect option(Value|Label)Field for arrays](https://review.typo3.org/#/c/36909/) @ TYPO3 Gerrit: 
 	* [Github PR](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests/pull/20)
@@ -67,11 +68,11 @@ Here are some examples how gotrap can look like:
 
 ## Requirements
 
-To run *gotrap* your Gerrit instance has to fulfil the requirements below, enable and configured two plugins:
+To run *gotrap*, your Gerrit instance has to fulfill the requirements listed below:
 
 * [Gerrit](https://code.google.com/p/gerrit/) in >= v2.9.0 (tested with v2.9.2 & v2.9.4. May work with a lower version)
 * Gerrit plugin [gerrit-rabbitmq-plugin](https://github.com/rinrinne/gerrit-rabbitmq-plugin)
-* Gerrit plugin `replication`
+* Gerrit plugin `replication` (shipped with Gerrit)
 
 ## Installation
 
@@ -93,27 +94,26 @@ Usage of ./gotrap:
 ```
 
 `-config` is a required setting.
-Without a configuration file *gotrap* won`t start.
-Please have a look at the [Configuration](#configuration) chapter how to configure *gotrap* properly.
+Without a configuration file, *gotrap* won't start.
+Please have a look at the [Configuration](#configuration) chapter, how to configure *gotrap* properly.
 
-`-pidfile` will wrote the process id of the running *gotrap* process into the given file.
+`-pidfile` will write the process id of the running *gotrap* process into the given file.
 This can be used to monitor *gotrap* via [Nagios](https://www.nagios.org/), [Icinga](https://www.icinga.org/) or something similar.
 
-`--version` won`t start gotrap as described.
-This will only output the current version number of *gotrap* like `gotrap v1.0.0`.
+`--version` will outpout the current version number.
 
 ## Configuration
 
 ### gotrap `config.json`
 
 The main configuration file is *config.json*.
-You can copy the template *config.json.dist* and replace the default settings with your values.
-To use this file with *gotrap* please us the `--config` parameter.
-The configuration is splitted into various parts.
-Below you will find a description of every part and setting with examples.
-Words written in uppercase are "variables" which needs to be replaced by you (themy example values of course, too).
+You can copy the template [config.json.dist](https://github.com/andygrunwald/gotrap/blob/master/config.json.dist) and adjust the defaults according to your environment.
+To specify this file as configuration parameter, supply the path to *gotrap* using the `--config` parameter.
+The configuration is splitted into several parts.
+Below, you will find a description of every part and setting with examples.
+Words written in uppercase are "variables" which *have to* be replaced by you.
 
-If you got a question regarding the configuration please open an issue and we will answer it and extend the documentation.
+If you have any question regarding the configuration, please open an issue. We will try to answer it and extend the documentation.
 
 #### Configuration part `gotrap`
 
@@ -123,7 +123,7 @@ If you got a question regarding the configuration please open an issue and we wi
 }
 ```
 
-*concurrent* is the number of Changesets / Merge Requests which are handled by *gotrap* in parallel.
+`concurrent` specifies the number of changesets / pull requests which are handled by *gotrap* in parallel.
 Please take in mind that this number depends on the [Per Repository Concurrency Setting of Travis CI](http://blog.travis-ci.com/2014-07-18-per-repository-concurrency-setting/).
 This is handled by a simple semaphore.
 
@@ -157,36 +157,36 @@ This is handled by a simple semaphore.
 },
 ```
 
-*gotrap* needs to create Merge Requests at Github to trigger services.
-The github section contain settings for the github connection.
+*gotrap* needs to create pull requests at Github to trigger services.
+The `github` section contains settings for the connection to Github.
 
-The `api-token` setting will be used to authenticate against Github *gotrap* with the use of [Personal API tokens](https://github.com/blog/1509-personal-api-tokens).
-This tokens are binded to the user.
+The `api-token` setting will be used to authenticate against Github using [Personal API tokens](https://github.com/blog/1509-personal-api-tokens).
+These tokens are bound to a user.
 You have to create one in your [personal settings](https://github.com/settings/tokens).
 
-To trigger the actions / hooks (like TravisCI) a merge request must be created.
-`organisation` and `repository` name the repository where those merge requests will be created.
+To trigger the actions / hooks (like for running Travis CI), a merge request on Github must be created.
+`organisation` and `repository` name the repository, where those pull requests will be created.
 The example shows the configuration for [typo3-ci/TYPO3.CMS-pre-merge-tests](https://github.com/typo3-ci/TYPO3.CMS-pre-merge-tests).
 
-Before we can create a merge request in the repository named in `organisation` and `repository` we have to ensure that the new changeset, created in Gerrit earlier, is replicated to github.
-*gotrap* itself will not replicate git commits / changesets.
-*gotrap* only checks if the branch is already replicated.
-If this branch is not replicated yet, it will wait `branch-polling-intervall` seconds before the next check will be made.
+Before we can create a merge request in the repository specified in `organisation`/ `repository`, we have to ensure that the changesets, which are created in Gerrit, are replicated to Github.
+*gotrap* itself will not replicate any git commits / changesets from Gerrit to Github (as such functionality is already implemented in Gerrit with the `replication` plugin).
+Instead, *gotrap* only checks, if the branch is already replicated.
+If such a branch is not replicated yet, it will wait for `branch-polling-intervall` seconds, before the next check will be made.
 This will be repeated until the branch is replicated.
 
-When the branch is rpelicated and the merge request is created, the configured services (like Travis CI) will be triggered by github.
-If this services are finished with their work they will report back the results to the [Commit Status API](https://github.com/blog/1227-commit-status-api).
-*gotrap* has to check if this happens already.
-`status-polling-intervall` is the number in seconds for how long *gotrap* will wait until the next check will be done.
-This will be done until the services are finished.
+When the branch is replicated and the merge request is created, the services (like Travis CI) that are configured by the owner of the Github repository, will be triggered by Github automatically.
+If all these services are finished with their work, they will report back the results to the [Commit Status API](https://github.com/blog/1227-commit-status-api).
+*gotrap* will wait, until this has happened.
+`status-polling-intervall` specifies the number of seconds to wait until the next check will be done.
 
 `pull-request` is a multiline field.
 This text is used as a template to define the Pull Request
-You can customize this as you want.
-Parts enclosed by *%* are variables.
-Those will be replaced by *gotrap* with detail information.
+Parts enclosed by *%* are variables and will be replaced by *gotrap* with respective information.
 
-#### Configuration part `amqp`
+#### Configuration Part `amqp`
+
+*gotrap* receives messages through [AMQP](http://www.amqp.org), a message queing protocol,
+The AMQP section contains settings for the connection to the AMQP broker, like [RabbitMQ](http://rabbitmq.com).
 
 ```json
 "amqp": {
@@ -204,19 +204,17 @@ Those will be replaced by *gotrap* with detail information.
 },
 ```
 
-*gotrap* receives messages by AMQP.
-The AMQP section contain settings for the AMQP broker.
+The settings `host`, `port`, `username`, `password` and `vhost` define the connection to the AMQP broker.
+`exchange` and `queue` define, the properties, where the information by Gerrit will be sent to.
+If the configured `exchange` and `queue` do not exists in the AMQP broker and if the `username` has rights to create those, *gotrap* will create exchange and queue. Valid attributes are described in the Gerrit plugin *gerrit-rabbitmq-plugin* chapter. If you create `exchange` and `queue` in advance on the broker, those have to match these attributes.
 
-This settings are typical parts of a broker like [RabbitMQ](http://rabbitmq.com).
-The settings `host`, `port`, `username`, `password` and `vhost` are values to get access to the AMQP broker.
-`exchange` and `queue` are the components where the new created message by Gerrit will be stored.
-If the configured `exchange` and `queue` are not exists and the `username` got rights to create those, *gotrap* will create this components with the attributes described in the Gerrit plugin *gerrit-rabbitmq-plugin* chapter. If you create `exchange` and `queue` in advance, those have to match these attributes.
+`routing-key` depends on your AMQP and Gerrit plugin `gerrit-rabbitmq-plugin` configuration. If you don't have a complex exchange <-> queue setup, a blank value is fine.
 
-`routing-key` depends on your AMQP and Gerrit plugin `gerrit-rabbitmq-plugin` configuration. If you don`t got a complex exchange <-> queue setup, a blank value is fine. In the most cases this value is an empty string.
+`identifier` is a string, which assign a name to a client that will receive messages by AMQP.
 
-`identifier` is a string which assign a name to a client which will receive messages by AMQP. This is visible in the broker.
+#### Configuration Part `gerrit`
 
-#### Configuration part `gerrit`
+*gotrap* needs to communicate with a Gerrit instance.
 
 ```json
 "gerrit": {
@@ -247,40 +245,34 @@ If the configured `exchange` and `queue` are not exists and the `username` got r
 }
 ```
 
-*gotrap* needs to communicate with a Gerrit instance.
-The gerrit section contain settings for the Gerrit instance.
-
-The `url` is the scheme + host + port fir the Gerrit instance.
-`username` and `password`are credentials which will be used to authentificate against the `url` Gerrit instance.
-Take in mind that the `username` needs access to the projects configured in `projects` to:
+The `url` is the scheme + host + port for the Gerrit instance.
+`username` and `password` are credentials, which will be used to authentificate against the Gerrit instance.
+Keep in mind that the `username` needs access to the projects configured in `projects` using the REST API to
 
 * GET changeset information by REST endpoint `/changes/`
 * POST a comment to a changeset by REST endpoint `/changes/`
 
-The `projects` settings is a map to whitelist projects handled by *gotrap*.
+The `projects` settings whitelists projects handled by *gotrap*.
 One Gerrit instance can handle multiple projects.
 One project can contain multiple branches.
-Sometimes you want to test only a few projects per Gerrit instance or a few branches per project.
+Sometimes, you want to test only a few projects per Gerrit instance or a few branches per project.
 A branch (e.g. *master* or *TYPO3_6-2*) needs `true` as value.
 Otherwise the branch is configured, but disabled.
 
-Take in mind: Every `project` which should be handled by *gotrap* needs to be configured.
-If a project contains no branches, every branch will be handled by *gotrap*.
-If a project got minimum one branch configured, the "all branches are whitelisted" behaviour is disabled and every branch which should be handled by *gotrap* needs to be configured.
+Keep in mind: Every `project` which should be handled by *gotrap* needs to be configured.
+If the `project` defines specifies at least one branch, only these will be handeled. Otherwise, all branches will be handled by *gotrap*.
 
-In the `exclude-pattern` array you can configure regular expressions to exclude changesets of configured `project` / branches.
+In the `exclude-pattern` array, you can configure regular expressions to exclude changesets of configured `project` / branches.
 With `"^\\[WIP\\].*"` you exclude all Changeset which are starts with "[WIP]" (e.g. [WIP] This is my not finished feature).
 WIP means *W*ork *I*n *P*rogress.
 
 `comment` is a multiline field.
 This text is used to post the results of the Github Pull Request (e.g. Travis CI) back to the Gerrit Changeset.
-You can customize this as you want.
-Parts enclosed by *%* are variables.
-Those will be replaced by *gotrap* with detail information.
+Parts enclosed by *%* are variables, which will be replaced with detail information.
 
-### Gerrit plugin `replication`
+### Gerrit Plugin `replication`
 
-All Changesets (including patchsets) has to be replicated to Github as branches. Otherwise we won`t be able to create pull requests.
+All changesets (including patchsets) have to be replicated to Github as branches. Otherwise we won't be able to create pull requests.
 
 Example configuration:
 ```
@@ -301,11 +293,9 @@ In the example above in the Github repository [typo3-ci/TYPO3.CMS-pre-merge-test
 
 ### Gerrit plugin `gerrit-rabbitmq-plugin`
 
-Please install the `gerrit-rabbitmq-plugin` according their documentation to publish Gerrit`s stream events to a message broker like [RabbitMQ](http://www.rabbitmq.com/).
+Please install the [gerrit-rabbitmq-plugin](https://github.com/rinrinne/gerrit-rabbitmq-plugin) according to its documentation in order to publish Gerrit's stream events to a message broker like [RabbitMQ](http://www.rabbitmq.com/).
 
-It is a common pattern to declare the exchange and queue of a AMQP broker. Below the attributes of the exchange and queue are listed.
-
-**Attention**: If the exchange and queue already exists the attributes has to be the same as listed below. If both doesn`t exist yet the user need the rights to declare and bind them.
+**Attention**: If the exchange and queue already exists, the attributes have to match the ones listed below. If both don't exist, yet, the user needs the rights to declare and bind them.
 
 #### Exchange
 
@@ -319,27 +309,27 @@ durable | autoDelete | exclusive | noWait
 ------- | ---------- | --------- | ------
 true    | false      | false     | false
 
-## Source code documentation
+## Source Code Documentation
 
-The source code itself is documented with [godoc](http://godoc.org/golang.org/x/tools/cmd/godoc) according their [standards](http://blog.golang.org/godoc-documenting-go-code).
+The source code itself is documented with [godoc](http://godoc.org/golang.org/x/tools/cmd/godoc) according to their [standards](http://blog.golang.org/godoc-documenting-go-code).
 You can see it at [gotrap @ godoc](https://godoc.org/github.com/andygrunwald/gotrap).
 
 ## Motivation
 
 I was active in the TYPO3 community some time ago.
-Most of this time i was focusing on quality, testing, stability, (custom) tools and similar.
-Since TYPO3 was using Gerrit and TravisCI came up.
-For all other projects i started to love TravisCI and i thought it would be cool to get TravisCI-Support for Gerrit Changesets with a self hosted Git infrastructure.
+Most of this time, I was focusing on quality, testing, stability, (custom) tools and similar.
+Since TYPO3 was using Gerrit and Travis CI came up.
+For all other projects, I started to love Travis CI and I thought it would be cool to get Travis CI-Support for Gerrit changesets with a self-hosted Git infrastructure.
 
-[Steffen Gebert](https://github.com/StephenKing) and me started to talk about this feature. And he liked this idea. Short after this chat i started hacking on this feature. This implementation was the most hackiest PHP code i ever wrote. This code never goes online.
+[Steffen Gebert](https://github.com/StephenKing) and me started to talk about this feature. And he liked this idea. Short after this chat I started hacking on this feature. This implementation was the most hackiest PHP code i ever wrote. This code never goes online.
 
-In February 2015 i met Steffen again at [Config Management Camp in Gent, Belgium](http://cfgmgmtcamp.eu/). We talked about this feature again and i started hacking. Again. But this time i wanted to learn a new language and was fascinated by [the go programming language](http://golang.org/).
+In February 2015 I met Steffen again at [Config Management Camp in Gent, Belgium](http://cfgmgmtcamp.eu/). We talked about this feature again and I started hacking. Again. But this time I wanted to learn a new language and was fascinated by [the go programming language](http://golang.org/).
 
 And here you see the result.
 
-## Alternative implementations
+## Alternative Implementations
 
-*gotrap* is maybe not the best solution for this job, but coding this was fun anyway. Have a look below for alternative / possible solution for this problem i can think about.
+*gotrap* is maybe not the best solution for this job, but coding this was fun anyway. Have a look below for alternative / possible solution for this problem I can think about.
 
 PS: If you had created such an alternative or know a different way how to solve this problem, let me know. I will be happy to include your way :wink:
 
@@ -347,67 +337,67 @@ PS: If you had created such an alternative or know a different way how to solve 
 
 [Jenkins](http://jenkins-ci.org/) is an awesome tool to execute such work as well. A [Gerrit Trigger](https://wiki.jenkins-ci.org/display/JENKINS/Gerrit+Trigger) plugin already exists and works like a charm in several environments.
 
-With the help of jenkins you can do the same communication like *gotrap*. 
+With the help of Jenkins you can do the same communication like *gotrap*. 
 One benefit over *gotrap* would be the log of the single actions / commands will be public visible. 
 Maybe helpful to get a better understanding of what is going on.
-With Jenkins you are not limited to TravisCI tests. You can add your tests as you want.
-The disadvantage is: You have to host and maintain a jenkins environment on your own.
+With Jenkins, you are not limited to Travis CI tests. You can add your tests as you want.
+The disadvantage is: You have to host and maintain a Jenkins environment on your own.
 
-But have a look what cool things you can create with jenkins (e.g. DB Datasets CI check):
+Cool possibilities of Jenkins include:
 
 * [Change microversion header name](https://review.openstack.org/#/c/155611/) @ OpenStack Gerrit
 * [Add check for non-existing table internal name for delete table](https://review.openstack.org/#/c/156806/) @ OpenStack Gerrit
 
-### Gerrit plugin
+### Gerrit Plugin
 
-Gerrit support custom plugins written in Java.
-To run *gotrap* we require two of them: `gerrit-rabbitmq-plugin` + `replication`.
+Gerrit supports plugins written in Java.
+To run *gotrap*, we require two of them: `gerrit-rabbitmq-plugin` + `replication`.
 
-To transfer this logic to a custom Gerrit plugin would make sense.
-With this we don\`t depend on two plugins and a custom tool written in Go.
-You don\`t have to deal with a deployment, configuration and monitoring of *gotrap*.
+To transfer this logic to a Gerrit plugin would make sense.
+With this, we would not depend on two plugins and the integration with yet another custom tool written in Go.
+You don't have to deal with a deployment, configuration and monitoring of *gotrap*.
 All configuration can be embedded into Gerrit.
 
 One disadvantages of this will be that you have to keep your plugin in sync with the development of Gerrit (if they change the plugin API).
-*gotrap* communicates via their public stream API (which won\`t be changed hopefully).
+*gotrap* communicates via their public stream API (which won't be changed hopefully).
 
 ## FAQ
 
-### How does gotrap works?
+### How gotrap Works
 
-[![How gotrap works](./docs/how-gotrap-works.png)](#how-does-gotrap-works)
+[![How gotrap works](./docs/how-gotrap-works.png)](#how-gotrap-works)
 
-1. A contributer pushes a new Changeset or Patchset to Gerrit.
+1. A contributer pushes a new changeset or patchset to Gerrit.
 2. The next two steps will be (nearly) done at the same time
 	1. The Gerrit plugin `gerrit-rabbitmq-plugin` will push a new event into the configured RabbitMQ broker.
-	2. The Gerrit plugin `replication` will synchronize the new Changeset or Patchset to the configured Github repository.
-3. *gotrap* will receive the pushed AMQP message.
-4. *gotrap* will check if the patchset from the AMQP event is the current patchset of the Changeset in Gerrit (sometimes contributer pushes new patchset really fast and before we started working on the first message. To avoid "double work" we got this sanity check).
-5. *gotrap* checks if the patchset is already synced as branch and creates a new merge request.
+	2. The Gerrit plugin `replication` will synchronize the new changeset or patchset to the configured Github repository.
+3. *gotrap* will receive the notification through the message queue.
+4. *gotrap* will check, if the patchset mentined in the notification is the current patchset of the changeset in Gerrit (sometimes contributors push new patchsets really fast and before we started working on the first message. To avoid "double work", we include this sanity check).
+5. *gotrap* checks, if the patchset is already synced as branch and creates a new merge request.
 6. Github will trigger Travis CI.
 7. If Travis CI is finished, it will report back the results to the Commit Status API. 
-8. Until Travis CI is done *gotrap* will check (via long polling) if Travis CI reports the results already.
-9. *gotrap* post the results of the Commit Status API as comment in the Changeset of Gerrit and closes the pull request on github.
+8. Until Travis CI is done, *gotrap* will check (via long polling) if Travis CI reported the results already.
+9. *gotrap* posts the results of the Commit Status API as comment in the changeset of Gerrit and closes the pull request on Github.
 
-### Why JSON as config file format?
+### Why JSON as Config File Format?
 
-Because json parsing is a standard package in golang and build in into the language. See [encoding/json](http://golang.org/pkg/encoding/json/).
+Because JSON parsing is a standard package in golang and build in into the language. See [encoding/json](http://golang.org/pkg/encoding/json/).
 
-### Which AMQP broker are supported?
+### Which AMQP Brokers are Supported?
 
 [RabbitMQ](http://www.rabbitmq.com/) is the only official supported AMQP broker currently.
-Maybe it works with others as well, but this was not tested.
+Very likely, it works well with other AMQP brokers, but this was not tested.
 
-### What is about the Github API rate limit?
+### What About the Github API Rate Limit?
 
-The Github API (in v3) got a [Rate limit](https://developer.github.com/v3/#rate-limiting).
-Currently (2015-03-13) this are
+The Github API (in v3) has a [rate limit](https://developer.github.com/v3/#rate-limiting).
+Currently (2015-03-13), the following limits apply:
 
 * Authenticated requests: 5000 requests per hour
 * Unauthenticated requests: 60 requests per hour
 
-*gotrap* needs an authentication at github to create pull requests.
-So we got 5.000 req / hour. Lets do a small calculation what this means:
+*gotrap* needs authentication at Github to create pull requests anyways.
+So we got 5.000 req / hour. Lets do a small calculation, what this means:
 
 Imagine it takes
 * 1 minute to synchronize your patchset to Github
@@ -417,19 +407,19 @@ Imagine it takes
 
 We configure `branch-polling-intervall` to `15` seconds and `status-polling-intervall` to `10` seconds.
 
-With this we get the following github requests until a result is pushed to Gerrit:
+The following API requests will be done until a result is pushed to Gerrit:
 
 * 4 requests to check if the branch is already synced
 * 1 request to create the merge request
 * 3 requests to check if Travis CI is already finished
-* 1 request to add a "closing comment" to the github merge request
+* 1 request to add a "closing comment" to the Github merge request
 * 1 request to close the merge request
 
-In theory we can handle 5000 / 10 = **500 patchsets per hour**.
-Please take in mind that some requests go wrong or some actions took longer than expected (e.g. scheduling and starting your tests on Travis CI).
+In theory, we can thus handle 5000 / 10 = **500 patchsets per hour**.
+Please keep in mind that some requests go wrong or some actions took longer than expected (e.g. scheduling and starting your tests on Travis CI).
 So plan some "spare" requests in (production can be hard).
 
-### Can i start multiple Travis CI tests in parallel?
+### Can I Start Multiple Travis CI Tests in Parallel?
 
 Yes, you can.
 You need to raise the `Concurrent jobs` setting at Travis CI.
@@ -441,4 +431,4 @@ This project is released under the terms of the [MIT license](http://en.wikipedi
 
 ## Credits
 
-* [Wilson Joseph](https://thenounproject.com/wilsonjoseph/) for his [User-Icon from The Noun Project](https://thenounproject.com/search/?q=developer&i=27713) used in the [How does gotrap works?](#how-does-gotrap-works) image
+* [Wilson Joseph](https://thenounproject.com/wilsonjoseph/) for his [User-Icon from The Noun Project](https://thenounproject.com/search/?q=developer&i=27713) used in the [How gotrap works](#how-gotrap-works) image
