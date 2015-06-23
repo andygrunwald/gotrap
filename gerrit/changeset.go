@@ -10,8 +10,9 @@ import (
 	"strings"
 )
 
-func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, error) {
-	urlToCall := fmt.Sprintf("%s/changes/%s/?o=CURRENT_REVISION", g.getAPIUrl(), changeID)
+func (g GerritInstance) GetChangeInformation(changeID string) (*ChangeInfo, error) {
+	urlToCall := fmt.Sprintf("%s/changes/%s/?o=CURRENT_REVISION", g.getAPIUrl(false), changeID)
+	log.Printf("Calling %s\n", urlToCall)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", urlToCall, nil)
@@ -29,7 +30,7 @@ func (g GerritInstance) getChangeInformation(changeID string) (*ChangeInfo, erro
 		log.Printf("> Change-details for change id \"%s\" received", changeID)
 
 	} else {
-		log.Printf("> Call success, but the status code doesn`t match ~200: %s", resp.Status)
+		log.Printf("> Call success, but the status code doesn`t match ~200: %s - %s", resp.Status, err)
 		return nil, errors.New("Call success, but the status code doesn`t match ~200")
 	}
 
