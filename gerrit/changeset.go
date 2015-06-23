@@ -53,7 +53,7 @@ func (g GerritInstance) PostCommentOnChangeset(m *Message, vote int, msg string)
 
 	changeID := m.Change.ID
 	revisionID := m.Patchset.Revision
-	urlToCall := fmt.Sprintf("%s/changes/%s/revisions/%s/review", g.getAPIUrl(), changeID, revisionID)
+	urlToCall := fmt.Sprintf("%s/changes/%s/revisions/%s/review", g.getAPIUrl(true), changeID, revisionID)
 
 	log.Printf("> Calling %s", urlToCall)
 
