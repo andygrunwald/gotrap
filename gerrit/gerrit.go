@@ -46,6 +46,7 @@ type Message struct {
 type ChangeInfo struct {
 	CurrentRevision string `json:"current_revision"`
 	Revisions       map[string]RevisionInfo
+	Status          string `json:"status"`
 }
 
 // @link https://review.typo3.org/Documentation/rest-api-changes.html#revision-info

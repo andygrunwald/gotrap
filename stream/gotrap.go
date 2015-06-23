@@ -8,7 +8,6 @@ import (
 	"github.com/andygrunwald/gotrap/github"
 	"log"
 	"regexp"
-	"strings"
 	"text/template"
 )
 
@@ -38,9 +37,18 @@ func (trap *Gotrap) TakeAction() {
 			return
 		}
 
-		// Check if change subject is excluded
-		if res, matchedPattern := trap.IsSubjectExcludedByPattern(trap.Message.Change.Subject); res == true {
-			log.Printf("> Subject \"%s\" excluded by pattern \"%s\"", trap.Message.Change.Subject, matchedPattern)
+		log.Printf("> Getting details of change %s", trap.Message.Change.ID)
+		gerritChangeSet, err := trap.gerritClient.GetChangeInformation(trap.Message.Change.ID)
+		if err != nil {
+			log.Printf("> Error getting details of change %s creating new pull request: %s", trap.Message.Change.ID, err)
+			return
+		}
+
+		// Check if the status of the changeset is NEW and not
+		// SUBMITTED, MERGED, ABANDONED or DRAFT
+		// We only accept NEW changesets
+		if gerritChangeSet.Status != "NEW" {
+			log.Printf("> Changeset skipped, because status is \"%s\" and not \"NEW\"", gerritChangeSet.Status)
 			return
 		}
 
@@ -51,8 +59,14 @@ func (trap *Gotrap) TakeAction() {
 		// The current patchset will be delivered later as message.
 		// So we won`t skip this changeset
 		// https://review.typo3.org/a/changes/I640486e9f32da6ac1eba05e3c38d15a0aba41055/?o=CURRENT_REVISION
-		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(trap.Message.Change.ID, trap.Message.Patchset.Number); currentPatchset == false {
+		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(gerritChangeSet, trap.Message.Patchset.Number); currentPatchset == false {
 			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s of %s)", trap.Message.Patchset.Ref, trap.Message.Change.URL)
+			return
+		}
+
+		// Check if change subject is excluded
+		if res, matchedPattern := trap.IsSubjectExcludedByPattern(trap.Message.Change.Subject); res == true {
+			log.Printf("> Subject \"%s\" excluded by pattern \"%s\"", trap.Message.Change.Subject, matchedPattern)
 			return
 		}
 
