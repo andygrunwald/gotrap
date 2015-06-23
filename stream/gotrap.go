@@ -83,7 +83,14 @@ func (trap *Gotrap) TakeAction() {
 		// Poll travis ci and wait until the PR got a status
 		s, _ := trap.githubClient.WaitUntilCommitStatusIsAvailable(*pullRequest)
 
+		// Build a combined data structure for templating
+		gotrapResult := github.PullRequest{
+			PullRequest:    pullRequest,
+			CombinedStatus: s,
+		}
+
 		var vote int
+		// TODO Are this all errors? Is there no "error" state?
 		switch *s.State {
 		// Success if the latest status for all contexts is success
 		case "success":
@@ -92,38 +99,28 @@ func (trap *Gotrap) TakeAction() {
 		// Failure if any of the contexts report as error or failure
 		case "failure":
 			vote = -1
+
 		}
 
-		// Generate detail information about status
-		var statusDetails []string
-		for _, repoStatus := range s.Statuses {
-			if *repoStatus.State != "success" {
-				continue
-			}
-
-			statusDetails = append(statusDetails, "Service: "+*repoStatus.Context)
-			statusDetails = append(statusDetails, "Description: "+*repoStatus.Description)
-			statusDetails = append(statusDetails, "URL: "+*repoStatus.TargetURL)
-			statusDetails = append(statusDetails, "\n")
+		// Build message to post results back to Gerrit
+		statusDetailsBuffer := new(bytes.Buffer)
+		var statusDetailsTemplate = template.Must(template.New("status-details").Parse(trap.gerritClient.Template))
+		err = statusDetailsTemplate.Execute(statusDetailsBuffer, gotrapResult)
+		if err != nil {
+			log.Println("> Error during prepare the status detail message", err)
+			return
 		}
-
-		// Build template for Gerrit vote action
-		// TODO: Replace message with text/template
-		msg := trap.gerritClient.Template
-		msg = strings.Replace(msg, "%state%", *s.State, 1)
-		msg = strings.Replace(msg, "%status%", strings.Join(statusDetails, "\n\n"), 1)
-		msg = strings.Replace(msg, "%pr%", *pullRequest.HTMLURL, 1)
 
 		// Post Command + Vote on Changeset
-		trap.gerritClient.PostCommentOnChangeset(&trap.Message, vote, msg)
+		trap.gerritClient.PostCommentOnChangeset(&trap.Message, vote, statusDetailsBuffer.String())
 
 		// TODO: Make text configurable
-		msg = "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.message.Change.Subject}}]({{.message.Change.URL}}) for details."
+		msg := "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.message.Change.Subject}}]({{.message.Change.URL}}) for details."
 
 		// Build message to close the Pull Request
 		closeMsgBuffer := new(bytes.Buffer)
 		var closeMsgTemplate = template.Must(template.New("pull-request-close-message").Parse(msg))
-		err = closeMsgTemplate.Execute(closeMsgBuffer, trap)
+		err = closeMsgTemplate.Execute(closeMsgBuffer, *trap)
 		if err != nil {
 			log.Println("> Error during prepare the pull request close message", err)
 			return

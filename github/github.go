@@ -16,6 +16,11 @@ type GithubClient struct {
 	Conf   *config.GithubConfiguration
 }
 
+type PullRequest struct {
+	PullRequest    *github.PullRequest
+	CombinedStatus *github.CombinedStatus
+}
+
 // tokenSource is an oauth2.TokenSource which returns a static access token
 type tokenSource struct {
 	token *oauth2.Token
