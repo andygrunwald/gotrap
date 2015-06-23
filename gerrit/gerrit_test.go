@@ -10,7 +10,7 @@ func TestGetAPIUrlIsNotEmpty(t *testing.T) {
 		URL: "https://review.typo3.org/",
 	}
 
-	if url := g.getAPIUrl(); len(url) == 0 {
+	if url := g.getAPIUrl(false); len(url) == 0 {
 		t.Fail()
 	}
 }
@@ -20,7 +20,7 @@ func TestGetAPIUrlContainsAuthPrefix(t *testing.T) {
 		URL: "https://review.typo3.org/",
 	}
 
-	if url := g.getAPIUrl(); strings.HasSuffix(url, "/a") == false {
+	if url := g.getAPIUrl(true); strings.HasSuffix(url, "/a") == false {
 		t.Fail()
 	}
 }

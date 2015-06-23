@@ -65,7 +65,12 @@ func NewGerritClient(c *config.GerritConfiguration) *GerritInstance {
 	return gerrit
 }
 
-func (g GerritInstance) getAPIUrl() string {
-	host := strings.TrimRight(g.URL, "/") + "/a"
+func (g GerritInstance) getAPIUrl(authRequired bool) string {
+	host := strings.TrimRight(g.URL, "/")
+
+	if authRequired == true {
+		host += "/a"
+	}
+
 	return host
 }
