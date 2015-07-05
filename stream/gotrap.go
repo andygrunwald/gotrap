@@ -72,8 +72,10 @@ func (trap *Gotrap) TakeAction() {
 		// Create the pull request
 		pullRequest, err := trap.githubClient.CreatePullRequestForPatchset(&trap.Message)
 		if err != nil {
-			// TODO: I don`t have an idea what to do if i fail to create a PR
-			log.Println("> Error during creating new pull request", err)
+			// If we fail to create a PR we stop here with this patchset.
+			// Without pull request no party.
+			log.Printf("> Error during creating new pull request: %s", err)
+			log.Printf("> Stopping process for the current patchset here and continue with the next one.")
 			return
 		}
 
