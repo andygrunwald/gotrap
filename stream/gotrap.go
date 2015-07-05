@@ -115,7 +115,7 @@ func (trap *Gotrap) TakeAction() {
 		trap.gerritClient.PostCommentOnChangeset(&trap.Message, vote, statusDetailsBuffer.String())
 
 		// TODO: Make text configurable
-		msg := "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.message.Change.Subject}}]({{.message.Change.URL}}) for details."
+		msg := "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.Message.Change.Subject}}]({{.Message.Change.URL}}) for details."
 
 		// Build message to close the Pull Request
 		closeMsgBuffer := new(bytes.Buffer)
