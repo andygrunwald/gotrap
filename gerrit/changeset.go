@@ -30,7 +30,7 @@ func (g GerritInstance) GetChangeInformation(changeID string) (*ChangeInfo, erro
 		log.Printf("> Change-details for change id \"%s\" received", changeID)
 
 	} else {
-		log.Printf("> Call success, but the status code doesn`t match ~200: %s - %s", resp.Status, err)
+		log.Printf("> Call success, but the status code doesn`t match ~200: %s", resp.Status)
 		return nil, errors.New("Call success, but the status code doesn`t match ~200")
 	}
 
