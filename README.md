@@ -141,13 +141,13 @@ This is handled by a simple semaphore.
   "status-polling-intervall": 30,
 
   "pull-request": {
-    "title": "Gotrap: %title%",
+    "title": "Gotrap: {{.Change.Subject}}",
     "body": [
-      "%commit-msg%",
+      "{{.Change.CommitMessage}}",
       "",
       "------",
       "",
-      "Details: %url%",
+      "Details: {{.Change.URL}}",
       "",
       "------",
       "",
@@ -180,8 +180,11 @@ If all these services are finished with their work, they will report back the re
 `status-polling-intervall` specifies the number of seconds to wait until the next check will be done.
 
 `pull-request` is a multiline field.
-This text is used as a template to define the Pull Request
-Parts enclosed by *%* are variables and will be replaced by *gotrap* with respective information.
+This text is used as a template to define the Pull Request.
+This multiline field will be joined together with new lines (every line is a new line in the end).
+The templating logic is based on the [text/template](http://golang.org/pkg/text/template/) package.
+Parts enclosed by *{{...}}* are variables and will be replaced by *gotrap* with respective information.
+The data structure [gerrit.Message](http://godoc.org/github.com/andygrunwald/gotrap/gerrit#Message) is available for templating for both parts (`pull-request.title` and `pull-request.body`).
 
 #### Configuration Part `amqp`
 
@@ -235,12 +238,17 @@ If the configured `exchange` and `queue` do not exists in the AMQP broker and if
   ],
 
   "comment": [
-    "Github tests: %state%",
+    "Github tests: {{ .CombinedStatus.State }}",
     "",
-    "Pull request: %pr%",
+    "Pull request: {{ .PullRequest.HTMLURL }}",
     "",
     "",
-    "%status%"
+    "{{ range $key, $value := .CombinedStatus.Statuses }}",
+      "Service: {{ $value.Context }}",
+      "Description: {{ $value.Description }}",
+      "URL: {{ $value.TargetURL }}",
+      "",
+    "{{ end }}"
   ]
 }
 ```
@@ -268,7 +276,10 @@ WIP means *W*ork *I*n *P*rogress.
 
 `comment` is a multiline field.
 This text is used to post the results of the Github Pull Request (e.g. Travis CI) back to the Gerrit Changeset.
-Parts enclosed by *%* are variables, which will be replaced with detail information.
+This multiline field will be joined together with new lines (every line is a new line in the end).
+The templating logic is based on the [text/template](http://golang.org/pkg/text/template/) package.
+Parts enclosed by *{{...}}* are variables and will be replaced by *gotrap* with respective information.
+The data structure [github.PullRequest](http://godoc.org/github.com/andygrunwald/gotrap/github#PullRequest) is available for templating for `comment`.
 
 ### Gerrit Plugin `replication`
 
