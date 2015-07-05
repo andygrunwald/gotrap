@@ -14,13 +14,13 @@
     "status-polling-intervall": 30,
 
     "pull-request": {
-      "title": "Gotrap: %title%",
+      "title": "Gotrap: {{.Change.Subject}}",
       "body": [
-        "%commit-msg%",
+        "{{.Change.CommitMessage}}",
         "",
         "------",
         "",
-        "Details: %url%",
+        "Details: {{.Change.URL}}",
         "",
         "------",
         "",
@@ -61,12 +61,17 @@
     ],
 
     "comment": [
-      "Github tests: %state%",
+      "Github tests: {{ .CombinedStatus.State }}",
       "",
-      "Pull request: %pr%",
+      "Pull request: {{ .PullRequest.HTMLURL }}",
       "",
       "",
-      "%status%"
+      "{{ range $key, $value := .CombinedStatus.Statuses }}",
+        "Service: {{ $value.Context }}",
+        "Description: {{ $value.Description }}",
+        "URL: {{ $value.TargetURL }}",
+        "",
+      "{{ end }}"
     ]
   }
 }
