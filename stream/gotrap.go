@@ -90,16 +90,19 @@ func (trap *Gotrap) TakeAction() {
 		}
 
 		var vote int
-		// TODO Are this all errors? Is there no "error" state?
+		// We only take care about every status except of "pending"
 		switch *s.State {
 		// Success if the latest status for all contexts is success
 		case "success":
 			vote = 0
 
+		// Error is the 3rd party service fails
+		case "error":
+			vote = 0
+
 		// Failure if any of the contexts report as error or failure
 		case "failure":
 			vote = -1
-
 		}
 
 		// Build message to post results back to Gerrit

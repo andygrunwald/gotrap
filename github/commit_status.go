@@ -36,6 +36,10 @@ Loop:
 				time.Sleep(time.Duration(c.Conf.StatusPollingIntervall) * time.Second)
 
 			// Failure if any of the contexts report as error or failure
+			case "error":
+				break Loop
+
+			// Failure if any of the contexts report as error or failure
 			case "failure":
 				break Loop
 			}
