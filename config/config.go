@@ -17,7 +17,6 @@ type gotrapConfiguration struct {
 }
 
 type GithubConfiguration struct {
-	Username               string                    `json:"username"`
 	APIToken               string                    `json:"api-token"`
 	Organisation           string                    `json:"organisation"`
 	Repository             string                    `json:"repository"`

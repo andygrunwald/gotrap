@@ -4,7 +4,6 @@
   },
 
   "github": {
-    "username": "GITHUB-USERNAME",
     "api-token": "GITHUB-API-TOKEN",
 
     "organisation": "GITHUB-ORGANISATION",

@@ -131,7 +131,6 @@ This is handled by a simple semaphore.
 
 ```json
 "github": {
-  "username": "TYPO3-Bot",
   "api-token": "GITHUB-API-TOKEN",
 
   "organisation": "typo3-ci",
