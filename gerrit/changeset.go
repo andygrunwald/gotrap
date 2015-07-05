@@ -12,7 +12,7 @@ import (
 
 func (g GerritInstance) GetChangeInformation(changeID string) (*ChangeInfo, error) {
 	urlToCall := fmt.Sprintf("%s/changes/%s/?o=CURRENT_REVISION", g.getAPIUrl(false), changeID)
-	log.Printf("Calling %s\n", urlToCall)
+	log.Printf("> Calling %s\n", urlToCall)
 
 	client := &http.Client{}
 	req, _ := http.NewRequest("GET", urlToCall, nil)
