@@ -40,7 +40,7 @@ func (trap *Gotrap) TakeAction() {
 		log.Printf("> Getting details of change %s", trap.Message.Change.ID)
 		gerritChangeSet, err := trap.gerritClient.GetChangeInformation(trap.Message.Change.ID)
 		if err != nil {
-			log.Printf("> Error getting details of change %s creating new pull request: %s", trap.Message.Change.ID, err)
+			log.Printf("> Error getting details of change %s: %s", trap.Message.Change.ID, err)
 			return
 		}
 
