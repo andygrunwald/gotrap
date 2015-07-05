@@ -52,15 +52,14 @@ func (trap *Gotrap) TakeAction() {
 			return
 		}
 
-		// TODO: Get current revision number
 		// If this revision / patchset number is not the current number
 		// we will skip this patchset-created request, because
 		// why should we create a pull request for an old patchset?
 		// The current patchset will be delivered later as message.
 		// So we won`t skip this changeset
-		// https://review.typo3.org/a/changes/I640486e9f32da6ac1eba05e3c38d15a0aba41055/?o=CURRENT_REVISION
 		if currentPatchset, _ := trap.gerritClient.IsPatchsetTheCurrentPatchset(gerritChangeSet, trap.Message.Patchset.Number); currentPatchset == false {
-			log.Printf("> Patchset skipped, because it is not the current one (Ref: %s of %s)", trap.Message.Patchset.Ref, trap.Message.Change.URL)
+			logMsg := "> Patchset skipped, because it is not the current one (patchset %d of %d, Ref: %s of %s)"
+			log.Printf(logMsg, trap.Message.Patchset.Number, gerritChangeSet.Revisions[gerritChangeSet.CurrentRevision].Number, trap.Message.Patchset.Ref, trap.Message.Change.URL)
 			return
 		}
 
