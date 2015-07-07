@@ -151,7 +151,8 @@ This is handled by a simple semaphore.
       "------",
       "",
       "This PR was created (automatically) by [gotrap](https://github.com/andygrunwald/gotrap) with :heart: and :beer:"
-    ]
+    ],
+    "close": "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.Message.Change.Subject}}]({{.Message.Change.URL}}) for details."
   }
 },
 ```
@@ -180,10 +181,11 @@ If all these services are finished with their work, they will report back the re
 
 `pull-request` is a multiline field.
 This text is used as a template to define the Pull Request.
+The `close` part is the template to close the pull request after the process.
 This multiline field will be joined together with new lines (every line is a new line in the end).
 The templating logic is based on the [text/template](http://golang.org/pkg/text/template/) package.
 Parts enclosed by *{{...}}* are variables and will be replaced by *gotrap* with respective information.
-The data structure [gerrit.Message](http://godoc.org/github.com/andygrunwald/gotrap/gerrit#Message) is available for templating for both parts (`pull-request.title` and `pull-request.body`).
+The data structure [gerrit.Message](http://godoc.org/github.com/andygrunwald/gotrap/gerrit#Message) is available for templating for both parts (`pull-request.title`, `pull-request.body` and `pull-request.close`).
 
 #### Configuration Part `amqp`
 

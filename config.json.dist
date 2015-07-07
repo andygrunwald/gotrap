@@ -24,7 +24,8 @@
         "------",
         "",
         "This PR was created (automatically) by [gotrap](https://github.com/andygrunwald/gotrap) with :heart: and :beer:"
-      ]
+      ],
+      "close": "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.Message.Change.Subject}}]({{.Message.Change.URL}}) for details."
     }
   },
 

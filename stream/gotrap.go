@@ -118,12 +118,9 @@ func (trap *Gotrap) TakeAction() {
 		// Post Command + Vote on Changeset
 		trap.gerritClient.PostCommentOnChangeset(&trap.Message, vote, statusDetailsBuffer.String())
 
-		// TODO: Make text configurable
-		msg := "This PR will be closed, because the tests results were reported back to Gerrit. See [{{.Message.Change.Subject}}]({{.Message.Change.URL}}) for details."
-
 		// Build message to close the Pull Request
 		closeMsgBuffer := new(bytes.Buffer)
-		var closeMsgTemplate = template.Must(template.New("pull-request-close-message").Parse(msg))
+		var closeMsgTemplate = template.Must(template.New("pull-request-close-message").Parse(trap.config.Github.PRTemplate.Close))
 		err = closeMsgTemplate.Execute(closeMsgBuffer, *trap)
 		if err != nil {
 			log.Println("> Error during prepare the pull request close message", err)

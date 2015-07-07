@@ -28,6 +28,7 @@ type GithubConfiguration struct {
 type githubPullRequestTemplate struct {
 	Title string   `json:"title"`
 	Body  []string `json:"body"`
+	Close string   `json:"close"`
 }
 
 type AmqpConfiguration struct {
