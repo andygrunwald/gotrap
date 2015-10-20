@@ -379,15 +379,15 @@ One disadvantages of this will be that you have to keep your plugin in sync with
 
 [![How gotrap works](./docs/how-gotrap-works.png)](#how-gotrap-works)
 
-1. A contributer pushes a new changeset or patchset to Gerrit.
+1. A contributor pushes a new changeset or patchset to Gerrit.
 2. The next two steps will be (nearly) done at the same time
 	1. The Gerrit plugin `gerrit-rabbitmq-plugin` will push a new event into the configured RabbitMQ broker.
 	2. The Gerrit plugin `replication` will synchronize the new changeset or patchset to the configured Github repository.
 3. *gotrap* will receive the notification through the message queue.
-4. *gotrap* will check, if the patchset mentined in the notification is the current patchset of the changeset in Gerrit (sometimes contributors push new patchsets really fast and before we started working on the first message. To avoid "double work", we include this sanity check).
+4. *gotrap* will check, if the patchset mentioned in the notification is the current patchset of the changeset in Gerrit (sometimes contributors push new patchsets really fast and before we started working on the first message. To avoid "double work", we include this sanity check).
 5. *gotrap* checks, if the patchset is already synced as branch and creates a new merge request.
 6. Github will trigger Travis CI.
-7. If Travis CI is finished, it will report back the results to the Commit Status API. 
+7. When Travis CI is finished, it will report back the results to the Commit Status API. 
 8. Until Travis CI is done, *gotrap* will check (via long polling) if Travis CI reported the results already.
 9. *gotrap* posts the results of the Commit Status API as comment in the changeset of Gerrit and closes the pull request on Github.
 
