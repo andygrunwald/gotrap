@@ -292,6 +292,8 @@ Example configuration:
   projects = Packages/TYPO3.CMS
   url = https://github.com/TYPO3-ci/TYPO3.CMS-pre-merge-tests.git
   push = +refs/changes/*:refs/heads/changes/*
+  push = +refs/heads/*:refs/heads/*
+  push = +refs/tags/*:refs/tags/*
   authGroup = Git Mirror
   mirror = true
   timeout = 120
