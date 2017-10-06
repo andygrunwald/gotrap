@@ -1,6 +1,7 @@
 package github
 
 import (
+	"context"
 	"log"
 	"time"
 )
@@ -11,10 +12,11 @@ import (
 // Attention: This call is "kind of" blocking.
 // It contains a for loop which ends only if the branch exists.
 func (c GithubClient) waitUntilBranchisSynced(branchName string) error {
+	ctx := context.Background()
 
 	// Loop until branch is found on github and synced by Gerrit
 	for {
-		branch, _, err := c.Client.Repositories.GetBranch(c.Conf.Organisation, c.Conf.Repository, branchName)
+		branch, _, err := c.Client.Repositories.GetBranch(ctx, c.Conf.Organisation, c.Conf.Repository, branchName)
 
 		// A typical error can be
 		// GET https://api.github.com/repos/... 404 Branch not found []

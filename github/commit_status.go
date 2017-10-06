@@ -1,9 +1,11 @@
 package github
 
 import (
-	"github.com/google/go-github/github"
+	"context"
 	"log"
 	"time"
+
+	"github.com/google/go-github/github"
 )
 
 // waitUntilCommitStatusIsAvailable checks if an external service (like TravisCI)
@@ -15,11 +17,12 @@ func (c GithubClient) WaitUntilCommitStatusIsAvailable(pr github.PullRequest) (*
 	// Wait one round before we start polling,
 	// because in most cases the external service isn`t so fast
 	time.Sleep(time.Duration(c.Conf.StatusPollingIntervall) * time.Second)
+	ctx := context.Background()
 
 Loop:
 	for {
 		log.Printf("> Try to get commit status for %v/%v -> %v\n", c.Conf.Organisation, c.Conf.Repository, *pr.Head.Ref)
-		s, _, err = c.Client.Repositories.GetCombinedStatus(c.Conf.Organisation, c.Conf.Repository, *pr.Head.Ref, nil)
+		s, _, err = c.Client.Repositories.GetCombinedStatus(ctx, c.Conf.Organisation, c.Conf.Repository, *pr.Head.Ref, nil)
 
 		if err != nil {
 			log.Printf("> Error during status fetch: %v\n", err)

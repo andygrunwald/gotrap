@@ -2,11 +2,13 @@ package github
 
 import (
 	"bytes"
+	"context"
 	"errors"
-	"github.com/andygrunwald/gotrap/gerrit"
-	"github.com/google/go-github/github"
 	"strings"
 	"text/template"
+
+	"github.com/andygrunwald/gotrap/gerrit"
+	"github.com/google/go-github/github"
 )
 
 // createPullRequestForPatchset will create a new Pull Request at Github
@@ -55,7 +57,8 @@ func (c GithubClient) CreatePullRequestForPatchset(m *gerrit.Message) (*github.P
 		Base:  &m.Change.Branch,
 		Body:  &body,
 	}
-	prResult, resp, err := c.Client.PullRequests.Create(c.Conf.Organisation, c.Conf.Repository, pr)
+	ctx := context.Background()
+	prResult, resp, err := c.Client.PullRequests.Create(ctx, c.Conf.Organisation, c.Conf.Repository, pr)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +71,9 @@ func (c GithubClient) AddCommentToPullRequest(pr *github.PullRequest, message st
 	comment := &github.IssueComment{
 		Body: &message,
 	}
-	_, resp, err := c.Client.Issues.CreateComment(c.Conf.Organisation, c.Conf.Repository, *pr.Number, comment)
+
+	ctx := context.Background()
+	_, resp, err := c.Client.Issues.CreateComment(ctx, c.Conf.Organisation, c.Conf.Repository, *pr.Number, comment)
 
 	if err != nil {
 		return false, err
@@ -84,7 +89,8 @@ func (c GithubClient) ClosePullRequest(pr *github.PullRequest) (bool, error) {
 		State: &state,
 	}
 
-	_, resp, err := c.Client.PullRequests.Edit(c.Conf.Organisation, c.Conf.Repository, *pr.Number, updatePr)
+	ctx := context.Background()
+	_, resp, err := c.Client.PullRequests.Edit(ctx, c.Conf.Organisation, c.Conf.Repository, *pr.Number, updatePr)
 	if err != nil {
 		return false, err
 	}
